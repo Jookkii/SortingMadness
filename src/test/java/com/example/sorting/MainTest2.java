@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class MainTest {
+public class MainTest2 {
 
     @Test
     public void testMain() {
