@@ -10,13 +10,20 @@
 
     <packaging>jar</packaging>
 
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Sorting Application</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
+
+    <scm>
+    <connection>scm:git:https://github.com/Jookkii/SortingMadness.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/Jookkii/SortingMadness.git</developerConnection>
+    <url>https://github.com/Jookkii/SortingMadness</url>
+    <tag>HEAD</tag>
+    </scm>
 
     <dependencies>
         <!-- Spring Boot Web (REST API) -->
