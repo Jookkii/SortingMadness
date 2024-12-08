@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*' # Workflow uruchamia się przy każdym puszu tagu zaczynającego się od "v"
 
+permissions:
+  contents: write  # Wymagane do tworzenia release
+
 jobs:
   build:
     runs-on: ubuntu-latest
