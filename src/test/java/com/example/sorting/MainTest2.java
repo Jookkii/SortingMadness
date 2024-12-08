@@ -8,6 +8,6 @@ public class MainTest2 {
 
     @Test
     public void testMain() {
-        assertTrue("Simple test passed!", true);
+        assertTrue("Simple test passed! testowanie action", true);
     }
 }
