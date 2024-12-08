@@ -1,0 +1,56 @@
+name: Release Workflow
+
+on:
+  push:
+    tags:
+      - 'v*' # Workflow uruchamia się przy każdym puszu tagu zaczynającego się od "v"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Sprawdź kod źródłowy
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Skonfiguruj JDK
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17' # Ustaw odpowiednią wersję Javy
+
+      # 3. Zbuduj projekt Maven
+      - name: Build with Maven
+        run: mvn clean install
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      # 1. Sprawdź kod źródłowy
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Stwórz release w GitHub Releases
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }} # Automatycznie używa nazwy taga (np. v1.0.0)
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      # 3. Dodaj pliki do release
+      - name: Upload JAR to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: target/SortingApp-1.0.0.jar # Zmień nazwę JAR zgodnie z projektem
+          asset_name: SortingApp-1.0.0.jar
+          asset_content_type: application/java-archive
