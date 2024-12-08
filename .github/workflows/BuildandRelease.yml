@@ -3,44 +3,42 @@ name: Release Workflow
 on:
   push:
     tags:
-      - 'v*' # Workflow uruchamia się przy każdym puszu tagu zaczynającego się od "v"
+      - 'v*'
 
 permissions:
-  contents: write  # Wymagane do tworzenia release
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Sprawdź kod źródłowy
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Skonfiguruj JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Zbuduj projekt Maven
       - name: Build with Maven
         run: mvn clean install
+
+      - name: List files in target
+        run: ls -l target
 
   release:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-      # 1. Sprawdź kod źródłowy
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Stwórz release w GitHub Releases
       - name: Create GitHub Release
-        id: create_release  # Ustaw ID, aby można było odwołać się do wyników tego kroku
-        uses: actions/create-release@v1
+        id: create_release
+        uses: actions/create-release@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -49,13 +47,12 @@ jobs:
           draft: false
           prerelease: false
 
-      # 3. Dodaj pliki do release
       - name: Upload JAR to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}  # Użyj "_" zamiast "-"
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: target/SortingApp.jar
           asset_name: SortingApp.jar
           asset_content_type: application/java-archive
