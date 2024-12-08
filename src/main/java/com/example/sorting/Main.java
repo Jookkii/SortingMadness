@@ -8,6 +8,6 @@ public class Main {
 
     public static void main(String[] args) {
         logger.info("Sorting Application Started!");
-        System.out.println("Welcome to Sorting Application!");
+        System.out.println("Welcome to Sorting Application! Tescik");
     }
 }
