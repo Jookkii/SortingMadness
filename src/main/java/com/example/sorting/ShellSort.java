@@ -1,7 +1,7 @@
 public class ShellSort {
 
-    public static int[] shellSort(int[] l) {
-        int n = l.length;
+    public static int[] sort(int[] l, int n) {
+//        int n = l.length;
         int[] result = l.clone();
         for (int gap = n / 2; gap > 0; gap /= 2) {
             for (int i = gap; i < n; i++) {
@@ -16,8 +16,8 @@ public class ShellSort {
         return result;
     }
 
-    public static String[] shellSort(String[] l) {
-        int n = l.length;
+    public static String[] sort(String[] l, int n) {
+//        int n = l.length;
         String[] result = l.clone();
         for (int gap = n / 2; gap > 0; gap /= 2) {
             for (int i = gap; i < n; i++) {
@@ -33,8 +33,8 @@ public class ShellSort {
     }
 
 
-    public static int[] shellSortReverse(int[] l) {
-        int n = l.length;
+    public static int[] sortInReverse(int[] l, int n) {
+//        int n = l.length;
         int[] result = l.clone();
         for (int gap = n / 2; gap > 0; gap /= 2) {
             for (int i = gap; i < n; i++) {
@@ -49,8 +49,8 @@ public class ShellSort {
         return result;
     }
 
-    public static String[] shellSortReverse(String[] l) {
-        int n = l.length;
+    public static String[] sortInReverse(String[] l, int n) {
+//        int n = l.length;
         String[] result = l.clone();
         for (int gap = n / 2; gap > 0; gap /= 2) {
             for (int i = gap; i < n; i++) {

@@ -2,13 +2,13 @@ import java.util.Stack;
 
 public class QuickSort {
 
-    public static int[] quickSort(int[] l) {
+    public static int[] sort(int[] l, int n) {
         if (l == null || l.length == 0) return l;
         int[] result = l.clone();
         Stack<int[]> stack = new Stack<>();
         stack.push(new int[]{0, result.length - 1});
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && n-- > 0) {
             int[] range = stack.pop();
             int low = range[0];
             int high = range[1];
@@ -22,13 +22,13 @@ public class QuickSort {
         return result;
     }
 
-    public static String[] quickSort(String[] l) {
+    public static String[] sort(String[] l, int n) {
         if (l == null || l.length == 0) return l;
         String[] result = l.clone();
         Stack<int[]> stack = new Stack<>();
         stack.push(new int[]{0, result.length - 1});
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && n-- > 0) {
             int[] range = stack.pop();
             int low = range[0];
             int high = range[1];
@@ -42,13 +42,13 @@ public class QuickSort {
         return result;
     }
 
-    public static int[] quickSortReverse(int[] l) {
+    public static int[] sortInReverse(int[] l, int n) {
         if (l == null || l.length == 0) return l;
         int[] result = l.clone();
         Stack<int[]> stack = new Stack<>();
         stack.push(new int[]{0, result.length - 1});
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && n-- > 0) {
             int[] range = stack.pop();
             int low = range[0];
             int high = range[1];
@@ -62,13 +62,13 @@ public class QuickSort {
         return result;
     }
 
-    public static String[] quickSortReverse(String[] l) {
+    public static String[] sortInReverse(String[] l, int n) {
         if (l == null || l.length == 0) return l;
         String[] result = l.clone();
         Stack<int[]> stack = new Stack<>();
         stack.push(new int[]{0, result.length - 1});
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && n-- > 0) {
             int[] range = stack.pop();
             int low = range[0];
             int high = range[1];

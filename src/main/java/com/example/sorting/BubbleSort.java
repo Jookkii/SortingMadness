@@ -1,7 +1,7 @@
 public class BubbleSort {
 
-    public static int[] bubbleSort(int[] l) {
-        int n = l.length;
+    public static int[] sort(int[] l, int n) {
+//        int n = l.length;
         boolean swap;
         int[] result = l.clone();
         for (int i = 0; i < n-1; i++) {
@@ -22,8 +22,8 @@ public class BubbleSort {
     }
 
 
-    public static String[] bubbleSort(String[] l) {
-        int n = l.length;
+    public static String[] sort(String[] l, int n) {
+//        int n = l.length;
         boolean swap;
         String[] result = l.clone();
         for (int i = 0; i < n-1; i++) {
@@ -44,8 +44,8 @@ public class BubbleSort {
     }
 
 
-    public static int[] bubbleSortReverse(int[] l) {
-        int n = l.length;
+    public static int[] sortInReverse(int[] l, int n) {
+//        int n = l.length;
         boolean swap;
         int[] result = l.clone();
         for (int i = 0; i < n-1; i++) {
@@ -66,8 +66,8 @@ public class BubbleSort {
     }
 
 
-    public static String[] bubbleSortReverse(String[] l) {
-        int n = l.length;
+    public static String[] sortInReverse(String[] l, int n) {
+//        int n = l.length;
         boolean swap;
         String[] result = l.clone();
         for (int i = 0; i < n-1; i++) {

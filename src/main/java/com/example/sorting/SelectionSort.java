@@ -1,7 +1,7 @@
 public class SelectionSort {
 
-    public static int[] selectionSort(int[] l) {
-        int n = l.length;
+    public static int[] sort(int[] l, int n) {
+//        int n = l.length;
         int[] result = l.clone();
         for (int i=0; i < n-1; i++) {
             int minIndex = i;
@@ -19,8 +19,8 @@ public class SelectionSort {
         return result;
     }
 
-    public static String[] selectionSort(String[] l) {
-        int n = l.length;
+    public static String[] sort(String[] l, int n) {
+//        int n = l.length;
         String[] result = l.clone();
         for (int i=0; i < n-1; i++) {
             int minIndex = i;
@@ -39,8 +39,8 @@ public class SelectionSort {
     }
 
 
-    public static int[] selectionSortReverse(int[] l) {
-        int n = l.length;
+    public static int[] sortInReverse(int[] l, int n) {
+//        int n = l.length;
         int[] result = l.clone();
         for (int i=0; i < n-1; i++) {
             int minIndex = i;
@@ -58,8 +58,8 @@ public class SelectionSort {
         return result;
     }
 
-    public static String[] selectionSortReverse(String[] l) {
-        int n = l.length;
+    public static String[] sortInReverse(String[] l, int n) {
+//        int n = l.length;
         String[] result = l.clone();
         for (int i=0; i < n-1; i++) {
             int minIndex = i;

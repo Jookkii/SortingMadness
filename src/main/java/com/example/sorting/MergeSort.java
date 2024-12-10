@@ -1,9 +1,9 @@
 public class MergeSort {
 
-    public static int[] mergeSort(int[] l) {
-        int n = l.length;
+    public static int[] sort(int[] l, int n) {
+//        int n = l.length;
         int[] result = l.clone();
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
+        for (int currentSize = 1; currentSize < result.length && n-- > 0; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
@@ -14,10 +14,10 @@ public class MergeSort {
         return result;
     }
 
-    public static String[] mergeSort(String[] l) {
-        int n = l.length;
+    public static String[] sort(String[] l, int n) {
+//        int n = l.length;
         String[] result = l.clone();
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
+        for (int currentSize = 1; currentSize < result.length && n-- > 0; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
@@ -28,10 +28,10 @@ public class MergeSort {
         return result;
     }
 
-    public static int[] mergeSortReverse(int[] l) {
-        int n = l.length;
+    public static int[] sortInReverse(int[] l, int n) {
+//        int n = l.length;
         int[] result = l.clone();
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
+        for (int currentSize = 1; currentSize < result.length && n-- > 0; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
@@ -42,10 +42,10 @@ public class MergeSort {
         return result;
     }
 
-    public static String[] mergeSortReverse(String[] l) {
-        int n = l.length;
+    public static String[] sortInReverse(String[] l, int n) {
+//        int n = l.length;
         String[] result = l.clone();
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
+        for (int currentSize = 1; currentSize < result.length && n-- > 0; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
