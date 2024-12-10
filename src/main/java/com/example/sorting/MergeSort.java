@@ -1,125 +1,68 @@
+import com.google.gson.Gson;
+import java.util.*;
+
 public class MergeSort {
 
-    public static int[] mergeSort(int[] l) {
-        int n = l.length;
-        int[] result = l.clone();
+    private static final Gson gson = new Gson();
+
+    public static <T> String mergeSort(T[] array, Comparator<T> comparator) {
+        long startTime = System.nanoTime();
+
+        T[] result = array.clone();
+        int n = result.length;
         for (int currentSize = 1; currentSize < n; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
 
-                merge(result, leftStart, mid, rightEnd, true);
+                merge(result, leftStart, mid, rightEnd, comparator);
             }
         }
-        return result;
+
+        long endTime = System.nanoTime();
+        long executionTime = endTime - startTime;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("sorted", result);
+        response.put("executionTime", executionTime);
+
+        return gson.toJson(response);
     }
 
-    public static String[] mergeSort(String[] l) {
-        int n = l.length;
-        String[] result = l.clone();
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
-
-                merge(result, leftStart, mid, rightEnd, true);
-            }
-        }
-        return result;
+    public static String mergeSort(int[] array, boolean reverse) {
+        Integer[] boxedArray = Arrays.stream(array).boxed().toArray(Integer[]::new);
+        Comparator<Integer> comparator = reverse ? Comparator.reverseOrder() : Comparator.naturalOrder();
+        return mergeSort(boxedArray, comparator);
     }
 
-    public static int[] mergeSortReverse(int[] l) {
-        int n = l.length;
-        int[] result = l.clone();
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
-
-                merge(result, leftStart, mid, rightEnd, false);
-            }
-        }
-        return result;
+    public static String mergeSort(String[] array, boolean reverse) {
+        Comparator<String> comparator = reverse ? Comparator.reverseOrder() : Comparator.naturalOrder();
+        return mergeSort(array, comparator);
     }
 
-    public static String[] mergeSortReverse(String[] l) {
-        int n = l.length;
-        String[] result = l.clone();
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
-
-                merge(result, leftStart, mid, rightEnd, false);
-            }
-        }
-        return result;
-    }
-
-    private static void merge(int[] l, int left, int mid, int right, boolean ascending) {
+    private static <T> void merge(T[] array, int left, int mid, int right, Comparator<T> comparator) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
 
-        int[] leftArr = new int[n1];
-        int[] rightArr = new int[n2];
-
-        for (int i = 0; i < n1; i++) {
-            leftArr[i] = l[left + i];
-        }
-        for (int j = 0; j < n2; j++) {
-            rightArr[j] = l[mid + 1 + j];
-        }
+        T[] leftArr = Arrays.copyOfRange(array, left, mid + 1);
+        T[] rightArr = Arrays.copyOfRange(array, mid + 1, right + 1);
 
         int i = 0, j = 0, k = left;
 
         while (i < n1 && j < n2) {
-            if ((ascending && leftArr[i] <= rightArr[j]) || (!ascending && leftArr[i] > rightArr[j])) {
-                l[k++] = leftArr[i++];
+            if (comparator.compare(leftArr[i], rightArr[j]) <= 0) {
+                array[k++] = leftArr[i++];
             } else {
-                l[k++] = rightArr[j++];
+                array[k++] = rightArr[j++];
             }
         }
 
         while (i < n1) {
-            l[k++] = leftArr[i++];
+            array[k++] = leftArr[i++];
         }
 
         while (j < n2) {
-            l[k++] = rightArr[j++];
-        }
-    }
-
-    private static void merge(String[] l, int left, int mid, int right, boolean ascending) {
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
-
-        String[] leftArr = new String[n1];
-        String[] rightArr = new String[n2];
-
-        for (int i = 0; i < n1; i++) {
-            leftArr[i] = l[left + i];
-        }
-        for (int j = 0; j < n2; j++) {
-            rightArr[j] = l[mid + 1 + j];
-        }
-
-        int i = 0, j = 0, k = left;
-
-        while (i < n1 && j < n2) {
-            if ((ascending && leftArr[i].compareTo(rightArr[j]) <= 0) ||
-                    (!ascending && leftArr[i].compareTo(rightArr[j]) > 0)) {
-                l[k++] = leftArr[i++];
-            } else {
-                l[k++] = rightArr[j++];
-            }
-        }
-
-        while (i < n1) {
-            l[k++] = leftArr[i++];
-        }
-
-        while (j < n2) {
-            l[k++] = rightArr[j++];
+            array[k++] = rightArr[j++];
         }
     }
 }
