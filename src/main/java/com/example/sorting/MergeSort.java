@@ -1,9 +1,38 @@
+package com.example.sorting;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class MergeSort {
 
-    public static int[] sort(int[] l, int n) {
-//        int n = l.length;
+    // Pomocnicza klasa do strukturyzacji wyniku sortowania
+    private static class SortResult<T> {
+        private long executionTime; // w nanosekundach
+        private T sortedArray;
+
+        public SortResult(long executionTime, T sortedArray) {
+            this.executionTime = executionTime;
+            this.sortedArray = sortedArray;
+        }
+
+        public long getExecutionTime() {
+            return executionTime;
+        }
+
+        public T getSortedArray() {
+            return sortedArray;
+        }
+    }
+
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    // Metoda sortująca int[] i zwracająca JSON
+    public static String mergeSort(int[] l) {
+        int n = l.length;
         int[] result = l.clone();
-        for (int currentSize = 1; currentSize < result.length && n-- > 0; currentSize *= 2) {
+        long startTime = System.nanoTime();
+
+        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
@@ -11,13 +40,21 @@ public class MergeSort {
                 merge(result, leftStart, mid, rightEnd, true);
             }
         }
-        return result;
+
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+
+        SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
+        return gson.toJson(sortResult);
     }
 
-    public static String[] sort(String[] l, int n) {
-//        int n = l.length;
+    // Metoda sortująca String[] i zwracająca JSON
+    public static String mergeSort(String[] l) {
+        int n = l.length;
         String[] result = l.clone();
-        for (int currentSize = 1; currentSize < result.length && n-- > 0; currentSize *= 2) {
+        long startTime = System.nanoTime();
+
+        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
@@ -25,13 +62,21 @@ public class MergeSort {
                 merge(result, leftStart, mid, rightEnd, true);
             }
         }
-        return result;
+
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+
+        SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
+        return gson.toJson(sortResult);
     }
 
-    public static int[] sortInReverse(int[] l, int n) {
-//        int n = l.length;
+    // Metoda sortująca int[] w odwrotnej kolejności i zwracająca JSON
+    public static String mergeSortReverse(int[] l) {
+        int n = l.length;
         int[] result = l.clone();
-        for (int currentSize = 1; currentSize < result.length && n-- > 0; currentSize *= 2) {
+        long startTime = System.nanoTime();
+
+        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
@@ -39,13 +84,21 @@ public class MergeSort {
                 merge(result, leftStart, mid, rightEnd, false);
             }
         }
-        return result;
+
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+
+        SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
+        return gson.toJson(sortResult);
     }
 
-    public static String[] sortInReverse(String[] l, int n) {
-//        int n = l.length;
+    // Metoda sortująca String[] w odwrotnej kolejności i zwracająca JSON
+    public static String mergeSortReverse(String[] l) {
+        int n = l.length;
         String[] result = l.clone();
-        for (int currentSize = 1; currentSize < result.length && n-- > 0; currentSize *= 2) {
+        long startTime = System.nanoTime();
+
+        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
             for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
@@ -53,9 +106,15 @@ public class MergeSort {
                 merge(result, leftStart, mid, rightEnd, false);
             }
         }
-        return result;
+
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+
+        SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
+        return gson.toJson(sortResult);
     }
 
+    // Metoda pomocnicza do scalania int[]
     private static void merge(int[] l, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
@@ -63,12 +122,8 @@ public class MergeSort {
         int[] leftArr = new int[n1];
         int[] rightArr = new int[n2];
 
-        for (int i = 0; i < n1; i++) {
-            leftArr[i] = l[left + i];
-        }
-        for (int j = 0; j < n2; j++) {
-            rightArr[j] = l[mid + 1 + j];
-        }
+        System.arraycopy(l, left, leftArr, 0, n1);
+        System.arraycopy(l, mid + 1, rightArr, 0, n2);
 
         int i = 0, j = 0, k = left;
 
@@ -89,6 +144,7 @@ public class MergeSort {
         }
     }
 
+    // Metoda pomocnicza do scalania String[]
     private static void merge(String[] l, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
@@ -96,12 +152,8 @@ public class MergeSort {
         String[] leftArr = new String[n1];
         String[] rightArr = new String[n2];
 
-        for (int i = 0; i < n1; i++) {
-            leftArr[i] = l[left + i];
-        }
-        for (int j = 0; j < n2; j++) {
-            rightArr[j] = l[mid + 1 + j];
-        }
+        System.arraycopy(l, left, leftArr, 0, n1);
+        System.arraycopy(l, mid + 1, rightArr, 0, n2);
 
         int i = 0, j = 0, k = left;
 
