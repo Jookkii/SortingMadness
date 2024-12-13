@@ -21,18 +21,17 @@
         function sendJson() {
             const jsonInput = document.getElementById('json-input').value;
             const sortName = document.getElementById('sortName').value;
-            const reverseState = '';
 
             let jsonData;
 
             try {
-                jsonData = JSON.parse(jsonInput); // Parsowanie wprowadzonego JSON-a
+                jsonData = JSON.parse(jsonInput);
             } catch (error) {
                 alert('Invalid JSON format. Please correct it and try again.');
                 return;
             }
 
-            fetch(`/${sortName}-numbers${reverseState ? '/' : ''}${reverseState}`, {
+            fetch(`/${sortName}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -49,18 +48,24 @@
                 });
         }
 
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     document.getElementById('send-json-button').addEventListener('click', sendJson);
-        // });
     </script>
 </head>
 <body>
 <h1>Bubble sort api</h1>
 <p><strong>Enter JSON to send to the API:</strong></p>
-<textarea id="json-input">[5, 3, 8, 1, 2]</textarea>
+<textarea id="json-input">
+{
+  "n": 6,
+  "array": [2, 5, 1, 7, 9, 0]
+}
+</textarea>
 <select id="sortName">
-    <option value="bubblesort">BUBEL TO TWOJA TWARZ</option>
-    <option value="insertionsort">iNZERT TO TWOJA TWARZ</option>
+    <option value="bubblesort">bubel</option>
+    <option value="insertionsort">insert</option>
+<!--    <option value="mergesort">bubel</option>-->
+<!--    <option value="quicksort">insert</option>-->
+<!--    <option value="selectionsort">bubel</option>-->
+<!--    <option value="shellsort">insert</option>-->
 </select>
 <button id="send-json-button" onclick="sendJson()">Send JSON</button>
 <p><strong>Response from API:</strong></p>
