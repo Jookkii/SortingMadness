@@ -3,9 +3,10 @@ package com.example.sorting.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.Stack;
-
 import com.google.gson.JsonObject;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import org.springframework.stereotype.Component;
 
 @Component("quicksort")
@@ -56,42 +57,39 @@ public class QuickSort implements SortJsonInterface {
             }
         }
 
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
 
-        SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
-        return gson.toJson(sortResult);
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    private static class SortRequest<T> {
+        JsonElement list;
+        int n;
+        boolean isReverse;
+        String key;
     }
 
-    public static String sort(String[] l, int n) {
-        if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
-        if (n > l.length) n = l.length;
-        String[] result = l.clone();
-        Stack<int[]> stack = new Stack<>();
-        stack.push(new int[]{0, result.length - 1});
+    public static String sort(String jsonInput) {
+    QuickSort.SortRequest request = gson.fromJson(jsonInput, QuickSort.SortRequest.class);
+        JsonElement listElement = request.list;
+        int n = request.n;
+        boolean isReverse = request.isReverse;
+        String key = request.key;
 
-        long startTime = System.nanoTime();
+        if (listElement.isJsonArray()) {
+            JsonArray jsonArray = listElement.getAsJsonArray();
 
-        while (!stack.isEmpty() && n-- > 0) {
-            int[] range = stack.pop();
-            int low = range[0];
-            int high = range[1];
-
-            if (low < high) {
-                int partitionIndex = partition(result, low, high, true);
-                stack.push(new int[]{low, partitionIndex - 1});
-                stack.push(new int[]{partitionIndex + 1, high});
+            if (jsonArray.size() > 0 && jsonArray.get(0).isJsonPrimitive() && jsonArray.get(0).getAsJsonPrimitive().isNumber()) {
+                int[] inputArray = gson.fromJson(jsonArray, int[].class);
+                return sortL(inputArray, n, isReverse);
+            }
+            else if (jsonArray.size() > 0 && jsonArray.get(0).isJsonPrimitive() && jsonArray.get(0).getAsJsonPrimitive().isString()) {
+                String[] inputArray = gson.fromJson(jsonArray, String[].class);
+                return sortL(inputArray, n, isReverse);
             }
         }
-
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
-
-        SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
-        return gson.toJson(sortResult);
+        throw new IllegalArgumentException("Unsupported data type in the list");
     }
 
-    public static String sortInReverse(int[] l, int n) {
+    public static String sortL(int[] l, int n, boolean isReverse) {
         if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
         if (n > l.length) n = l.length;
         int[] result = l.clone();
@@ -106,7 +104,13 @@ public class QuickSort implements SortJsonInterface {
             int high = range[1];
 
             if (low < high) {
-                int partitionIndex = partition(result, low, high, false);
+                int partitionIndex;
+                if (isReverse) {
+                    partitionIndex = partition(result, low, high, false);
+                }
+                else {
+                    partitionIndex = partition(result, low, high, true);
+                }
                 stack.push(new int[]{low, partitionIndex - 1});
                 stack.push(new int[]{partitionIndex + 1, high});
             }
@@ -119,7 +123,7 @@ public class QuickSort implements SortJsonInterface {
         return gson.toJson(sortResult);
     }
 
-    public static String sortInReverse(String[] l, int n) {
+    public static String sortL(String[] l, int n, boolean isReverse) {
         if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
         if (n > l.length) n = l.length;
         String[] result = l.clone();
@@ -134,7 +138,13 @@ public class QuickSort implements SortJsonInterface {
             int high = range[1];
 
             if (low < high) {
-                int partitionIndex = partition(result, low, high, false);
+                int partitionIndex;
+                if (isReverse) {
+                    partitionIndex = partition(result, low, high, false);
+                }
+                else {
+                    partitionIndex = partition(result, low, high, true);
+                }
                 stack.push(new int[]{low, partitionIndex - 1});
                 stack.push(new int[]{partitionIndex + 1, high});
             }
@@ -146,6 +156,7 @@ public class QuickSort implements SortJsonInterface {
         SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
+
 
     private static int partition(int[] arr, int low, int high, boolean ascending) {
         int pivot = arr[high];
