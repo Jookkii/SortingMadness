@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class SelectionSort {
 
     private static class SortResult<T> {
-        private long executionTime; // w nanosekundach
+        private long executionTime;
         private T sortedArray;
 
         public SortResult(long executionTime, T sortedArray) {
@@ -27,13 +27,12 @@ public class SelectionSort {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static String selectionSort(int[] l) {
+    public static String sort(int[] l, int n) {
         if (l == null || l.length == 0) {
             SortResult<int[]> sortResult = new SortResult<>(0L, l);
             return gson.toJson(sortResult);
         }
-
-        int n = l.length;
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
 
         long startTime = System.nanoTime();
@@ -59,13 +58,12 @@ public class SelectionSort {
         return gson.toJson(sortResult);
     }
 
-    public static String selectionSort(String[] l) {
+    public static String sort(String[] l, int n) {
         if (l == null || l.length == 0) {
             SortResult<String[]> sortResult = new SortResult<>(0L, l);
             return gson.toJson(sortResult);
         }
-
-        int n = l.length;
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
 
         long startTime = System.nanoTime();
@@ -91,13 +89,12 @@ public class SelectionSort {
         return gson.toJson(sortResult);
     }
 
-    public static String selectionSortReverse(int[] l) {
+    public static String sortInReverse(int[] l, int n) {
         if (l == null || l.length == 0) {
             SortResult<int[]> sortResult = new SortResult<>(0L, l);
             return gson.toJson(sortResult);
         }
-
-        int n = l.length;
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
 
         long startTime = System.nanoTime();
@@ -123,13 +120,12 @@ public class SelectionSort {
         return gson.toJson(sortResult);
     }
 
-    public static String selectionSortReverse(String[] l) {
+    public static String sortInReverse(String[] l, int n) {
         if (l == null || l.length == 0) {
             SortResult<String[]> sortResult = new SortResult<>(0L, l);
             return gson.toJson(sortResult);
         }
-
-        int n = l.length;
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
 
         long startTime = System.nanoTime();
@@ -149,7 +145,7 @@ public class SelectionSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);

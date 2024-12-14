@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class ShellSort {
 
     private static class SortResult<T> {
-        private long executionTime; // w nanosekundach
+        private long executionTime;
         private T sortedArray;
 
         public SortResult(long executionTime, T sortedArray) {
@@ -28,12 +28,11 @@ public class ShellSort {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 
-    public static String shellSort(int[] l) {
+    public static String sort(int[] l, int n) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-
-        int n = l.length;
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
 
         long startTime = System.nanoTime();
@@ -57,12 +56,11 @@ public class ShellSort {
     }
 
 
-    public static String shellSort(String[] l) {
+    public static String sort(String[] l, int n) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-
-        int n = l.length;
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
 
         long startTime = System.nanoTime();
@@ -86,12 +84,11 @@ public class ShellSort {
     }
 
 
-    public static String shellSortReverse(int[] l) {
+    public static String sortInReverse(int[] l, int n) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-
-        int n = l.length;
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
 
         long startTime = System.nanoTime();
@@ -115,12 +112,11 @@ public class ShellSort {
     }
 
 
-    public static String shellSortReverse(String[] l) {
+    public static String sortInReverse(String[] l, int n) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-
-        int n = l.length;
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
 
         long startTime = System.nanoTime();

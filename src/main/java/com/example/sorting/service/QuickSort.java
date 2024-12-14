@@ -8,9 +8,8 @@ import org.springframework.stereotype.Component;
 @Component("quickSort")
 public class QuickSort {
 
-    // Pomocnicza klasa do strukturyzacji wyniku sortowania
     private static class SortResult<T> {
-        private long executionTime; // w nanosekundach
+        private long executionTime;
         private T sortedArray;
 
         public SortResult(long executionTime, T sortedArray) {
@@ -29,17 +28,16 @@ public class QuickSort {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    // Metoda sortująca int[] i zwracająca JSON
-    public static String quickSort(int[] l) {
+    public static String sort(int[] l, int n) {
         if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
-
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
         Stack<int[]> stack = new Stack<>();
         stack.push(new int[]{0, result.length - 1});
 
         long startTime = System.nanoTime();
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && n-- > 0) {
             int[] range = stack.pop();
             int low = range[0];
             int high = range[1];
@@ -52,23 +50,22 @@ public class QuickSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
 
-    // Metoda sortująca String[] i zwracająca JSON
-    public static String quickSort(String[] l) {
+    public static String sort(String[] l, int n) {
         if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
-
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
         Stack<int[]> stack = new Stack<>();
         stack.push(new int[]{0, result.length - 1});
 
         long startTime = System.nanoTime();
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && n-- > 0) {
             int[] range = stack.pop();
             int low = range[0];
             int high = range[1];
@@ -81,23 +78,22 @@ public class QuickSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
 
-    // Metoda sortująca int[] w odwrotnej kolejności i zwracająca JSON
-    public static String quickSortReverse(int[] l) {
+    public static String sortInReverse(int[] l, int n) {
         if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
-
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
         Stack<int[]> stack = new Stack<>();
         stack.push(new int[]{0, result.length - 1});
 
         long startTime = System.nanoTime();
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && n-- > 0) {
             int[] range = stack.pop();
             int low = range[0];
             int high = range[1];
@@ -110,23 +106,22 @@ public class QuickSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
 
-    // Metoda sortująca String[] w odwrotnej kolejności i zwracająca JSON
-    public static String quickSortReverse(String[] l) {
+    public static String sortInReverse(String[] l, int n) {
         if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
-
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
         Stack<int[]> stack = new Stack<>();
         stack.push(new int[]{0, result.length - 1});
 
         long startTime = System.nanoTime();
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && n-- > 0) {
             int[] range = stack.pop();
             int low = range[0];
             int high = range[1];
@@ -139,13 +134,12 @@ public class QuickSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
 
-    // Metoda pomocnicza do partition dla int[]
     private static int partition(int[] arr, int low, int high, boolean ascending) {
         int pivot = arr[high];
         int i = low - 1;
@@ -153,14 +147,12 @@ public class QuickSort {
         for (int j = low; j < high; j++) {
             if ((ascending && arr[j] < pivot) || (!ascending && arr[j] >= pivot)) {
                 i++;
-                // Zamiana arr[i] i arr[j]
                 int temp = arr[i];
                 arr[i] = arr[j];
                 arr[j] = temp;
             }
         }
 
-        // Zamiana arr[i + 1] i arr[high] (pivot)
         int temp = arr[i + 1];
         arr[i + 1] = arr[high];
         arr[high] = temp;
@@ -168,7 +160,6 @@ public class QuickSort {
         return i + 1;
     }
 
-    // Metoda pomocnicza do partition dla String[]
     private static int partition(String[] arr, int low, int high, boolean ascending) {
         String pivot = arr[high];
         int i = low - 1;
@@ -176,14 +167,12 @@ public class QuickSort {
         for (int j = low; j < high; j++) {
             if ((ascending && arr[j].compareTo(pivot) < 0) || (!ascending && arr[j].compareTo(pivot) >= 0)) {
                 i++;
-                // Zamiana arr[i] i arr[j]
                 String temp = arr[i];
                 arr[i] = arr[j];
                 arr[j] = temp;
             }
         }
 
-        // Zamiana arr[i + 1] i arr[high] (pivot)
         String temp = arr[i + 1];
         arr[i + 1] = arr[high];
         arr[high] = temp;

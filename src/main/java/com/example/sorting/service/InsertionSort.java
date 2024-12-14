@@ -12,9 +12,8 @@ import org.springframework.stereotype.Component;
 @Component("insertionSort")
 public class InsertionSort {
 
-    // Pomocnicza klasa do strukturyzacji wyniku sortowania dla obiektów
     private static class SortResult<T> {
-        private long executionTime; // w nanosekundach
+        private long executionTime;
         private T sortedArray;
 
         public SortResult(long executionTime, T sortedArray) {
@@ -31,9 +30,8 @@ public class InsertionSort {
         }
     }
 
-    // Pomocnicza klasa do strukturyzacji wyniku sortowania dla prymitywnych typów
     private static class SortResultPrimitive {
-        private long executionTime; // w nanosekundach
+        private long executionTime;
         private int[] sortedArray;
 
         public SortResultPrimitive(long executionTime, int[] sortedArray) {
@@ -56,11 +54,11 @@ public class InsertionSort {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResultPrimitive(0L, l));
         }
-
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
         long startTime = System.nanoTime();
 
-        for (int i = 1; i < n; i++) { // Rozpoczynamy od 1, ponieważ element 0 jest już posortowany
+        for (int i = 1; i < n; i++) {
             int key = result[i];
             int j = i - 1;
             while (j >= 0 && result[j] > key) {
@@ -71,7 +69,7 @@ public class InsertionSort {
         }
 
         long endTime = System.nanoTime();
-        long executionTime = endTime - startTime; // Czas w nanosekundach
+        long executionTime = endTime - startTime;
 
         SortResultPrimitive sortResult = new SortResultPrimitive(executionTime, result);
         return gson.toJson(sortResult);
@@ -82,11 +80,11 @@ public class InsertionSort {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
         long startTime = System.nanoTime();
 
-        for (int i = 1; i < n; i++) { // Rozpoczynamy od 1, ponieważ element 0 jest już posortowany
+        for (int i = 1; i < n; i++) {
             String key = result[i];
             int j = i - 1;
             while (j >= 0 && result[j].compareTo(key) > 0) {
@@ -97,7 +95,7 @@ public class InsertionSort {
         }
 
         long endTime = System.nanoTime();
-        long executionTime = endTime - startTime; // Czas w nanosekundach
+        long executionTime = endTime - startTime;
 
         SortResult<String[]> sortResult = new SortResult<>(executionTime, result);
         return gson.toJson(sortResult);
@@ -107,11 +105,11 @@ public class InsertionSort {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResultPrimitive(0L, l));
         }
-
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
         long startTime = System.nanoTime();
 
-        for (int i = 1; i < n; i++) { // Rozpoczynamy od 1, ponieważ element 0 jest już posortowany
+        for (int i = 1; i < n; i++) {
             int key = result[i];
             int j = i - 1;
             while (j >= 0 && result[j] < key) {
@@ -122,7 +120,7 @@ public class InsertionSort {
         }
 
         long endTime = System.nanoTime();
-        long executionTime = endTime - startTime; // Czas w nanosekundach
+        long executionTime = endTime - startTime;
 
         SortResultPrimitive sortResult = new SortResultPrimitive(executionTime, result);
         return gson.toJson(sortResult);
@@ -133,11 +131,11 @@ public class InsertionSort {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
         long startTime = System.nanoTime();
 
-        for (int i = 1; i < n; i++) { // Rozpoczynamy od 1, ponieważ element 0 jest już posortowany
+        for (int i = 1; i < n; i++) {
             String key = result[i];
             int j = i - 1;
             while (j >= 0 && result[j].compareTo(key) < 0) {
@@ -148,7 +146,7 @@ public class InsertionSort {
         }
 
         long endTime = System.nanoTime();
-        long executionTime = endTime - startTime; // Czas w nanosekundach
+        long executionTime = endTime - startTime;
 
         SortResult<String[]> sortResult = new SortResult<>(executionTime, result);
         return gson.toJson(sortResult);
