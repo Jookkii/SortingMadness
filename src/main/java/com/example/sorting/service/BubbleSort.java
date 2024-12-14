@@ -2,8 +2,16 @@ package com.example.sorting.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.stereotype.Component;
 
-public class BubbleSort {
+@Component("bubblesort")
+public class BubbleSort implements SortJsonInterface {
+
+    @Override
+    public Gson sort(Gson gson){
+        return gson;
+    };
 
     private static class SortResult<T> {
         private long executionTime; // w milisekundach

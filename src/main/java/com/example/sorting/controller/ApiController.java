@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 
 @RestController
 public class ApiController {
-    //private final SortContext sortContext;
+    private final SortContext sortContext;
 
-    //@Autowired
-    //public ApiController() {
-        //this.sortContext = sortContext;
-    //}
+    @Autowired
+    public ApiController(SortContext sortContext) {
+        this.sortContext = sortContext;
+    }
     @PostMapping("/bubblesort")
     public String bubbleSort(@RequestBody SortRequest request) {
         int n = request.getN();

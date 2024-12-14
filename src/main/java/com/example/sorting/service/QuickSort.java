@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import java.util.Stack;
 import org.springframework.stereotype.Component;
 
-@Component("quickSort")
+@Component("quicksort")
 public class QuickSort {
 
     private static class SortResult<T> {

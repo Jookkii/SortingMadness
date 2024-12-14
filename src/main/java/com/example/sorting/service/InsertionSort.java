@@ -7,10 +7,17 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
 
-@Component("insertionSort")
-public class InsertionSort {
+@Component("insertionsort")
+public class InsertionSort implements SortJsonInterface {
+
+
+    public Gson sort(Gson gson){
+        return gson;
+    };
 
     private static class SortResult<T> {
         private long executionTime;

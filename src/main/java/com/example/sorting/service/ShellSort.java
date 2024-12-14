@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.stereotype.Component;
 
-@Component("shellSort")
+@Component("shellsort")
 public class ShellSort {
 
     private static class SortResult<T> {
