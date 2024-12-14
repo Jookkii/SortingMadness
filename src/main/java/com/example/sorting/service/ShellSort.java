@@ -2,10 +2,15 @@ package com.example.sorting.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.springframework.stereotype.Component;
 
 @Component("shellsort")
-public class ShellSort {
+public class ShellSort implements SortJsonInterface{
+
+    public JsonObject sort(JsonObject obj){
+        return obj;
+    };
 
     private static class SortResult<T> {
         private long executionTime;

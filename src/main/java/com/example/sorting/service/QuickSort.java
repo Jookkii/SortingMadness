@@ -3,10 +3,13 @@ package com.example.sorting.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.Stack;
+
+import com.google.gson.JsonObject;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
 
 @Component("quicksort")
-public class QuickSort {
+public class QuickSort implements SortJsonInterface {
 
     private static class SortResult<T> {
         private long executionTime;
@@ -25,6 +28,10 @@ public class QuickSort {
             return sortedArray;
         }
     }
+
+    public JsonObject sort(JsonObject obj){
+        return obj;
+    };
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

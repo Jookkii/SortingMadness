@@ -1,5 +1,6 @@
 package com.example.sorting.service;
 
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,10 @@ public class SortContext {
         this.strategies = strategies;
     }
 
-    public Gson sort(String algorithm, Gson gson) {
+    public JsonObject sort(String algorithm, JsonObject json) {
         SortJsonInterface strategy = strategies.get(algorithm);
         if (strategy != null) {
-            return strategy.sort(gson);
+            return strategy.sort(json);
         } else {
             throw new IllegalArgumentException("Unknown sorting algorithm: " + algorithm);
         }

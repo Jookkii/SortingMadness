@@ -2,10 +2,18 @@ package com.example.sorting.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
 
 @Component("selectionsort")
-public class SelectionSort {
+public class SelectionSort implements SortJsonInterface {
+
+
+
+    public JsonObject sort(JsonObject obj){
+        return obj;
+    };
 
     private static class SortResult<T> {
         private long executionTime;

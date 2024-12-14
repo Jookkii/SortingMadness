@@ -2,6 +2,7 @@ package com.example.sorting.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Component;
 public class MergeSort implements SortJsonInterface {
 
 
-    public Gson sort(Gson gson){
-        return gson;
+    public JsonObject sort(JsonObject obj) {
+        return obj;
     };
 
     private static class SortResult<T> {

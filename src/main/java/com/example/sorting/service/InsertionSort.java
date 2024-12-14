@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.JsonObject;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Component;
 public class InsertionSort implements SortJsonInterface {
 
 
-    public Gson sort(Gson gson){
-        return gson;
+    public JsonObject sort(JsonObject obj){
+        return obj;
     };
 
     private static class SortResult<T> {
