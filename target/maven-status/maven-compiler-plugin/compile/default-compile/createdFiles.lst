@@ -1,14 +1,1 @@
-com\example\sorting\QuickSort.class
-com\example\sorting\BubbleSort.class
-com\example\sorting\ShellSort$SortResult.class
-com\example\sorting\InsertionSort$SortResultPrimitive.class
-com\example\sorting\BubbleSort$SortResult.class
-com\example\sorting\InsertionSort.class
-com\example\sorting\MergeSort$SortResult.class
-com\example\sorting\QuickSort$SortResult.class
-com\example\sorting\SelectionSort.class
-com\example\sorting\ShellSort.class
-com\example\sorting\SelectionSort$SortResult.class
-com\example\sorting\MergeSort.class
-com\example\sorting\InsertionSort$SortResult.class
 com\example\sorting\Main.class
