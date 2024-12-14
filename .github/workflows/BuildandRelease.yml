@@ -35,6 +35,13 @@ jobs:
           -u "/project/version" \
           -v "${{ env.version }}" pom.xml
 
+      - name: Checkout branch
+        run: |
+          git fetch origin main:main
+          git checkout main
+
+
+
       - name: Commit updated pom.xml
         run: |
           git config user.name "github-actions[bot]"
