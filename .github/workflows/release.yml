@@ -55,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn release:prepare release:perform -B
+          mvn release:prepare release:perform -B -X
 
       # 7. Buduj projekt po release
       - name: Build Project
