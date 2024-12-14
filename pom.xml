@@ -89,10 +89,11 @@
                 <configuration>
                     <pushChanges>true</pushChanges>
                     <scm>
+                        <connection>scm:git:https://github.com/Jookkii/SortingMadness.git</connection>
                         <developerConnection>scm:git:https://github.com/Jookkii/SortingMadness.git</developerConnection>
                     </scm>
                 </configuration>
-</plugin>
+            </plugin>
 
         </plugins>
     </build>
