@@ -2,6 +2,9 @@ package com.example.sorting.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +13,8 @@ import org.springframework.stereotype.Component;
 public class MergeSort implements SortJsonInterface {
 
 
-    public Gson sort(Gson gson){
-        return gson;
+    public JsonObject sort(JsonObject obj){
+        return obj;
     };
 
     private static class SortResult<T> {
@@ -34,7 +37,36 @@ public class MergeSort implements SortJsonInterface {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static String sort(int[] l, int n) {
+    private static class SortRequest<T> {
+        JsonElement list;
+        int n;
+        boolean isReverse;
+        String key;
+    }
+
+    public static String sort(String jsonInput) {
+        MergeSort.SortRequest request = gson.fromJson(jsonInput, MergeSort.SortRequest.class);
+        JsonElement listElement = request.list;
+        int n = request.n;
+        boolean isReverse = request.isReverse;
+        String key = request.key;
+
+        if (listElement.isJsonArray()) {
+            JsonArray jsonArray = listElement.getAsJsonArray();
+
+            if (jsonArray.size() > 0 && jsonArray.get(0).isJsonPrimitive() && jsonArray.get(0).getAsJsonPrimitive().isNumber()) {
+                int[] inputArray = gson.fromJson(jsonArray, int[].class);
+                return sortL(inputArray, n, isReverse);
+            }
+            else if (jsonArray.size() > 0 && jsonArray.get(0).isJsonPrimitive() && jsonArray.get(0).getAsJsonPrimitive().isString()) {
+                String[] inputArray = gson.fromJson(jsonArray, String[].class);
+                return sortL(inputArray, n, isReverse);
+            }
+        }
+        throw new IllegalArgumentException("Unsupported data type in the list");
+    }
+
+    public static String sortL(int[] l, int n, boolean isReverse) {
         if (n > l.length) n = l.length;
         int[] result = l.clone();
         long startTime = System.nanoTime();
@@ -44,7 +76,11 @@ public class MergeSort implements SortJsonInterface {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
 
-                merge(result, leftStart, mid, rightEnd, true);
+                if (isReverse) {
+                    merge(result, leftStart, mid, rightEnd, false);
+                } else {
+                    merge(result, leftStart, mid, rightEnd, true);
+                }
             }
         }
 
@@ -55,7 +91,7 @@ public class MergeSort implements SortJsonInterface {
         return gson.toJson(sortResult);
     }
 
-    public static String sort(String[] l, int n) {
+    public static String sortL(String[] l, int n, boolean isReverse) {
         if (n > l.length) n = l.length;
         String[] result = l.clone();
         long startTime = System.nanoTime();
@@ -65,7 +101,11 @@ public class MergeSort implements SortJsonInterface {
                 int mid = Math.min(leftStart + currentSize - 1, n - 1);
                 int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
 
-                merge(result, leftStart, mid, rightEnd, true);
+                if (isReverse) {
+                    merge(result, leftStart, mid, rightEnd, false);
+                } else {
+                    merge(result, leftStart, mid, rightEnd, true);
+                }
             }
         }
 
@@ -76,47 +116,6 @@ public class MergeSort implements SortJsonInterface {
         return gson.toJson(sortResult);
     }
 
-    public static String sortInReverse(int[] l, int n) {
-        if (n > l.length) n = l.length;
-        int[] result = l.clone();
-        long startTime = System.nanoTime();
-
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
-
-                merge(result, leftStart, mid, rightEnd, false);
-            }
-        }
-
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
-
-        SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
-        return gson.toJson(sortResult);
-    }
-
-    public static String sortInReverse(String[] l, int n) {
-        if (n > l.length) n = l.length;
-        String[] result = l.clone();
-        long startTime = System.nanoTime();
-
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
-
-                merge(result, leftStart, mid, rightEnd, false);
-            }
-        }
-
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
-
-        SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
-        return gson.toJson(sortResult);
-    }
 
     private static void merge(int[] l, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
