@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
+@Component("insertionSort")
 public class InsertionSort {
 
     // Pomocnicza klasa do strukturyzacji wyniku sortowania dla obiektów

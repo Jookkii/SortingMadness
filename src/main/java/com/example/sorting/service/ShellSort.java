@@ -2,7 +2,9 @@ package com.example.sorting.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.springframework.stereotype.Component;
 
+@Component("shellSort")
 public class ShellSort {
 
     private static class SortResult<T> {

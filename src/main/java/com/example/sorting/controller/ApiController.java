@@ -2,6 +2,7 @@ package com.example.sorting.controller;
 
 import com.example.sorting.dto.*;
 import com.example.sorting.service.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -10,7 +11,12 @@ import java.util.stream.Collectors;
 
 @RestController
 public class ApiController {
+    //private final SortContext sortContext;
 
+    //@Autowired
+    //public ApiController() {
+        //this.sortContext = sortContext;
+    //}
     @PostMapping("/bubblesort")
     public String bubbleSort(@RequestBody SortRequest request) {
         int n = request.getN();

@@ -3,7 +3,9 @@ package com.example.sorting.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.Stack;
+import org.springframework.stereotype.Component;
 
+@Component("quickSort")
 public class QuickSort {
 
     // Pomocnicza klasa do strukturyzacji wyniku sortowania
