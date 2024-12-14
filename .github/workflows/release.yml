@@ -52,18 +52,34 @@ jobs:
                   </servers>
                 </settings>" > ~/.m2/settings.xml
 
-      # 6. Uruchom Maven Release Plugin
+      # 6. Wymuś HTTPS dla GIT (zamiana SSH na HTTPS)
+      - name: Override GIT_SSH_COMMAND
+        run: |
+          git config core.sshCommand "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+          git config --global url."https://github.com/".insteadOf ssh://git@github.com
+          git remote set-url origin https://github.com/${{ github.repository }}
+          git remote -v
+
+      - name: Fetch all tags
+        run: git fetch --tags
+
+
+      - name: Clean Maven release state
+      run: |
+          rm -f release.properties
+
+      # 7. Uruchom Maven Release Plugin
       - name: Maven Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mvn release:prepare release:perform -B -X
 
-      # 7. Buduj projekt po release
+      # 8. Buduj projekt po release
       - name: Build Project
         run: mvn clean install
 
-      # 8. Opcjonalnie: Przesyłanie artefaktu do GitHub Release
+      # 9. Opcjonalnie: Przesyłanie artefaktu do GitHub Release
       - name: Upload JAR to Release
         uses: actions/upload-release-asset@v1
         env:
