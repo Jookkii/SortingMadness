@@ -2,7 +2,10 @@ package com.example.sorting.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.springframework.stereotype.Component;
 
+
+@Component("mergeSort")
 public class MergeSort {
 
     private static class SortResult<T> {
