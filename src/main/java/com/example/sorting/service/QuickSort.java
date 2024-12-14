@@ -30,33 +30,6 @@ public class QuickSort implements SortJsonInterface {
         }
     }
 
-    public JsonObject sort(JsonObject obj){
-        return obj;
-    };
-
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-    public static String sort(int[] l, int n) {
-        if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
-        if (n > l.length) n = l.length;
-        int[] result = l.clone();
-        Stack<int[]> stack = new Stack<>();
-        stack.push(new int[]{0, result.length - 1});
-
-        long startTime = System.nanoTime();
-
-        while (!stack.isEmpty() && n-- > 0) {
-            int[] range = stack.pop();
-            int low = range[0];
-            int high = range[1];
-
-            if (low < high) {
-                int partitionIndex = partition(result, low, high, true);
-                stack.push(new int[]{low, partitionIndex - 1});
-                stack.push(new int[]{partitionIndex + 1, high});
-            }
-        }
-
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -67,26 +40,39 @@ public class QuickSort implements SortJsonInterface {
         String key;
     }
 
-    public static String sort(String jsonInput) {
-    QuickSort.SortRequest request = gson.fromJson(jsonInput, QuickSort.SortRequest.class);
+    public String sort(JsonObject jsonInput) {
+        QuickSort.SortRequest request = gson.fromJson(jsonInput, QuickSort.SortRequest.class);
+
         JsonElement listElement = request.list;
         int n = request.n;
         boolean isReverse = request.isReverse;
         String key = request.key;
 
-        if (listElement.isJsonArray()) {
-            JsonArray jsonArray = listElement.getAsJsonArray();
+        if (listElement == null || !listElement.isJsonArray()) {
+            throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
+        }
 
-            if (jsonArray.size() > 0 && jsonArray.get(0).isJsonPrimitive() && jsonArray.get(0).getAsJsonPrimitive().isNumber()) {
+        JsonArray jsonArray = listElement.getAsJsonArray();
+
+        if (jsonArray.size() == 0) {
+            return gson.toJson(new int[0]);
+        }
+
+        JsonElement firstElement = jsonArray.get(0);
+
+        if (firstElement.isJsonPrimitive()) {
+            if (firstElement.getAsJsonPrimitive().isNumber()) {
                 int[] inputArray = gson.fromJson(jsonArray, int[].class);
                 return sortL(inputArray, n, isReverse);
             }
-            else if (jsonArray.size() > 0 && jsonArray.get(0).isJsonPrimitive() && jsonArray.get(0).getAsJsonPrimitive().isString()) {
+
+            if (firstElement.getAsJsonPrimitive().isString()) {
                 String[] inputArray = gson.fromJson(jsonArray, String[].class);
                 return sortL(inputArray, n, isReverse);
             }
         }
-        throw new IllegalArgumentException("Unsupported data type in the list");
+
+        throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
     }
 
     public static String sortL(int[] l, int n, boolean isReverse) {

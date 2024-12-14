@@ -10,10 +10,6 @@ import org.springframework.stereotype.Component;
 @Component("bubblesort")
 public class BubbleSort implements SortJsonInterface {
 
-    @Override
-    public JsonObject sort(JsonObject input){
-        return input;
-    };
 
     private static class SortResult<T> {
         private long executionTime;
@@ -42,26 +38,39 @@ public class BubbleSort implements SortJsonInterface {
         String key;
     }
 
-    public static String sort(String jsonInput) {
-        SortRequest request = gson.fromJson(jsonInput, SortRequest.class);
+    public String sort(JsonObject jsonInput) {
+        BubbleSort.SortRequest request = gson.fromJson(jsonInput, BubbleSort.SortRequest.class);
+
         JsonElement listElement = request.list;
         int n = request.n;
         boolean isReverse = request.isReverse;
         String key = request.key;
 
-        if (listElement.isJsonArray()) {
-            JsonArray jsonArray = listElement.getAsJsonArray();
+        if (listElement == null || !listElement.isJsonArray()) {
+            throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
+        }
 
-            if (jsonArray.size() > 0 && jsonArray.get(0).isJsonPrimitive() && jsonArray.get(0).getAsJsonPrimitive().isNumber()) {
+        JsonArray jsonArray = listElement.getAsJsonArray();
+
+        if (jsonArray.size() == 0) {
+            return gson.toJson(new int[0]);
+        }
+
+        JsonElement firstElement = jsonArray.get(0);
+
+        if (firstElement.isJsonPrimitive()) {
+            if (firstElement.getAsJsonPrimitive().isNumber()) {
                 int[] inputArray = gson.fromJson(jsonArray, int[].class);
                 return sortL(inputArray, n, isReverse);
             }
-            else if (jsonArray.size() > 0 && jsonArray.get(0).isJsonPrimitive() && jsonArray.get(0).getAsJsonPrimitive().isString()) {
+
+            if (firstElement.getAsJsonPrimitive().isString()) {
                 String[] inputArray = gson.fromJson(jsonArray, String[].class);
                 return sortL(inputArray, n, isReverse);
             }
         }
-        throw new IllegalArgumentException("Unsupported data type in the list");
+
+        throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
     }
 
     public static String sortL(int[] l, int n, boolean isReverse) {
