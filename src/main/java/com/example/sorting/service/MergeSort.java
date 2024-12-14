@@ -5,9 +5,8 @@ import com.google.gson.GsonBuilder;
 
 public class MergeSort {
 
-    // Pomocnicza klasa do strukturyzacji wyniku sortowania
     private static class SortResult<T> {
-        private long executionTime; // w nanosekundach
+        private long executionTime;
         private T sortedArray;
 
         public SortResult(long executionTime, T sortedArray) {
@@ -26,9 +25,8 @@ public class MergeSort {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    // Metoda sortująca int[] i zwracająca JSON
-    public static String mergeSort(int[] l) {
-        int n = l.length;
+    public static String sort(int[] l, int n) {
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
         long startTime = System.nanoTime();
 
@@ -42,15 +40,14 @@ public class MergeSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
 
-    // Metoda sortująca String[] i zwracająca JSON
-    public static String mergeSort(String[] l) {
-        int n = l.length;
+    public static String sort(String[] l, int n) {
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
         long startTime = System.nanoTime();
 
@@ -64,15 +61,14 @@ public class MergeSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
 
-    // Metoda sortująca int[] w odwrotnej kolejności i zwracająca JSON
-    public static String mergeSortReverse(int[] l) {
-        int n = l.length;
+    public static String sortInReverse(int[] l, int n) {
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
         long startTime = System.nanoTime();
 
@@ -86,15 +82,14 @@ public class MergeSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
 
-    // Metoda sortująca String[] w odwrotnej kolejności i zwracająca JSON
-    public static String mergeSortReverse(String[] l) {
-        int n = l.length;
+    public static String sortInReverse(String[] l, int n) {
+        if (n > l.length) n = l.length;
         String[] result = l.clone();
         long startTime = System.nanoTime();
 
@@ -108,13 +103,12 @@ public class MergeSort {
         }
 
         long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime; // Czas w nanosekundach
+        long elapsedTime = endTime - startTime;
 
         SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
 
-    // Metoda pomocnicza do scalania int[]
     private static void merge(int[] l, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
@@ -144,7 +138,6 @@ public class MergeSort {
         }
     }
 
-    // Metoda pomocnicza do scalania String[]
     private static void merge(String[] l, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;

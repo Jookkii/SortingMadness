@@ -27,6 +27,7 @@ public class BubbleSort {
 
     public static String sort(int[] l, int n) {
         boolean swap;
+        if (n > l.length) n = l.length;
         int[] result = l.clone();
         long startTime = System.nanoTime();
 
@@ -55,6 +56,7 @@ public class BubbleSort {
     public static String sort(String[] l, int n) {
         boolean swap;
         String[] result = l.clone();
+        if (n > l.length) n = l.length;
         long startTime = System.nanoTime();
 
         for (int i = 0; i < n - 1; i++) {
@@ -82,6 +84,7 @@ public class BubbleSort {
     public static String sortInReverse(int[] l, int n) {
         boolean swap;
         int[] result = l.clone();
+        if (n > l.length) n = l.length;
         long startTime = System.nanoTime();
 
         for (int i = 0; i < n - 1; i++) {
@@ -109,6 +112,7 @@ public class BubbleSort {
     public static String sortInReverse(String[] l, int n) {
         boolean swap;
         String[] result = l.clone();
+        if (n > l.length) n = l.length;
         long startTime = System.nanoTime();
 
         for (int i = 0; i < n - 1; i++) {
