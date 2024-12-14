@@ -30,29 +30,43 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-      # 4. Ustaw token GitHub (do tagowania i publikowania zmian)
+      # 4. Skonfiguruj Maven settings.xml
+      - name: Configure Maven settings
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+                  <servers>
+                    <server>
+                      <id>github</id>
+                      <username>${{ github.actor }}</username>
+                      <password>${{ secrets.GITHUB_TOKEN }}</password>
+                    </server>
+                  </servers>
+                </settings>" > ~/.m2/settings.xml
+
+      # 5. Ustaw token GitHub (do tagowania i publikowania zmian)
       - name: Set up GitHub Token
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git remote set-url origin https://${GH_TOKEN}@github.com/${{ github.repository }}
 
-      # 5. Uruchom Maven Release Plugin
+      # 6. Uruchom Maven Release Plugin
       - name: Maven Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           mvn release:prepare release:perform -B
 
-      # 6. Buduj projekt po release
+      # 7. Buduj projekt po release
       - name: Build Project
         run: mvn clean install
 
-      # 7. Opcjonalnie: Przesyłanie artefaktu do GitHub Release
+      # 8. Opcjonalnie: Przesyłanie artefaktu do GitHub Release
       - name: Upload JAR to Release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: target/SortingApp.jar

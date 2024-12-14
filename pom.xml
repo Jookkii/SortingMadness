@@ -17,10 +17,11 @@
 
     <scm>
     <connection>scm:git:https://github.com/Jookkii/SortingMadness.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/Jookkii/SortingMadness.git</developerConnection>
+    <developerConnection>scm:git:https://github.com/Jookkii/SortingMadness.git</developerConnection>
     <url>https://github.com/Jookkii/SortingMadness</url>
     <tag>${project.version}</tag>
     </scm>
+
 
     <dependencies>
         <!-- Spring Boot Web (REST API) -->
