@@ -3,7 +3,6 @@ package com.example.sorting.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.Stack;
-
 import com.google.gson.JsonObject;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import com.google.gson.JsonArray;
@@ -34,6 +33,30 @@ public class QuickSort implements SortJsonInterface {
     public JsonObject sort(JsonObject obj){
         return obj;
     };
+
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    public static String sort(int[] l, int n) {
+        if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
+        if (n > l.length) n = l.length;
+        int[] result = l.clone();
+        Stack<int[]> stack = new Stack<>();
+        stack.push(new int[]{0, result.length - 1});
+
+        long startTime = System.nanoTime();
+
+        while (!stack.isEmpty() && n-- > 0) {
+            int[] range = stack.pop();
+            int low = range[0];
+            int high = range[1];
+
+            if (low < high) {
+                int partitionIndex = partition(result, low, high, true);
+                stack.push(new int[]{low, partitionIndex - 1});
+                stack.push(new int[]{partitionIndex + 1, high});
+            }
+        }
+
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 

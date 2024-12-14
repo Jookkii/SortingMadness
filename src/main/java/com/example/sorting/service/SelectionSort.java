@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component("selectionsort")
 public class SelectionSort implements SortJsonInterface {
+
     public JsonObject sort(JsonObject obj){
         return obj;
     };
