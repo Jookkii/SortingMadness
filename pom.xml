@@ -7,7 +7,7 @@
 
     <packaging>jar</packaging>
 
-    <version>0.1.10-SNAPSHOT</version>
+    <version>0.1.14-SNAPSHOT</version>
     <name>Sorting Application</name>
 
     <properties>
@@ -89,6 +89,7 @@
                 <configuration>
                     <pushChanges>true</pushChanges>
                     <useReleaseProfile>false</useReleaseProfile>
+                    <goals>clean verify</goals>
                     <serverId>github</serverId>
                     <scm>
                         <connection>scm:git:https://github.com/Jookkii/SortingMadness.git</connection>
