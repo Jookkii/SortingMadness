@@ -3,7 +3,7 @@ name: Maven Release and Build Workflow
 on:
   push:
     tags:
-      - 'SortingApp-*'
+      - 'v*'
 
 permissions:
   contents: write
