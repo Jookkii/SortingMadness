@@ -93,8 +93,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: SortingApp-${{ env.NORMALIZED_VERSION }}
-          release_name: Release SortingApp-${{ env.NORMALIZED_VERSION }}
+          tag_name: "SortingApp-${{ env.NORMALIZED_VERSION }}"
+          release_name: "Release SortingApp-${{ env.NORMALIZED_VERSION }}"
           draft: false
           prerelease: false
 
