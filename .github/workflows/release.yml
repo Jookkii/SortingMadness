@@ -35,16 +35,18 @@ jobs:
           echo "Remote URL:"
           git remote -v
 
+      # 4. Wyodrębnij wersję z pom.xml
       - name: Extract version from pom.xml
         id: extract_version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      # 5. Debuguj wyodrębnioną wersję
       - name: Debug extracted version
         run: echo "Extracted version: ${{ env.VERSION }}"
 
-      # 4. Skonfiguruj HTTPS Git z tokenem
+      # 6. Skonfiguruj HTTPS Git z tokenem
       - name: Configure HTTPS Git with GITHUB_TOKEN
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,13 +58,13 @@ jobs:
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git remote -v
 
-      # 5. Pobierz wszystkie tagi i gałęzie
+      # 7. Pobierz wszystkie tagi i gałęzie
       - name: Fetch all tags and branches
         run: |
           git fetch --all
           git fetch --tags
 
-      # 6. Maven Release
+      # 8. Maven Release
       - name: Maven Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
