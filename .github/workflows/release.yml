@@ -24,18 +24,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Debuguj zmienne środowiskowe
-      - name: Debug environment variables
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Actor: ${{ github.actor }}"
-          echo "Repository: ${{ github.repository }}"
-          echo "Token length: ${#GITHUB_TOKEN}"
-          echo "Remote URL:"
-          git remote -v
-
-      # 4. Wyodrębnij wersję z pom.xml
+      # 3. Wyodrębnij wersję z pom.xml
       - name: Extract version from pom.xml
         id: extract_version
         run: |
@@ -43,12 +32,17 @@ jobs:
           echo "Extracted version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      # 5. Debuguj wyodrębnioną wersję
-      - name: Debug extracted version
+      # 4. Normalizuj wersję dla tagów
+      - name: Normalize version for tag
+        id: normalize_version
         run: |
-          echo "Extracted version: $VERSION"
-        env:
-          VERSION: ${{ env.VERSION }}
+          NORMALIZED_VERSION=$(echo "${{ env.VERSION }}" | sed 's/-SNAPSHOT//g')
+          echo "Normalized version: $NORMALIZED_VERSION"
+          echo "NORMALIZED_VERSION=$NORMALIZED_VERSION" >> $GITHUB_ENV
+
+      # 5. Debuguj wyodrębnioną wersję
+      - name: Debug normalized version
+        run: echo "Normalized version: ${{ env.NORMALIZED_VERSION }}"
 
       # 6. Skonfiguruj HTTPS Git z tokenem
       - name: Configure HTTPS Git with GITHUB_TOKEN
@@ -76,6 +70,10 @@ jobs:
         run: |
           mvn release:prepare release:perform -B -X
 
+      # 9. Debuguj utworzone tagi
+      - name: Debug created tags
+        run: git tag
+
   create_release:
     needs: release
     runs-on: ubuntu-latest
@@ -92,8 +90,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: SortingApp-${{ env.VERSION }}
-          release_name: Release SortingApp-${{ env.VERSION }}
+          tag_name: SortingApp-${{ env.NORMALIZED_VERSION }}
+          release_name: Release SortingApp-${{ env.NORMALIZED_VERSION }}
           draft: false
           prerelease: false
 
