@@ -1,18 +1,13 @@
 package com.example.sorting.controller;
 
-import com.example.sorting.dto.*;
 import com.example.sorting.service.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @RestController
 public class ApiController {
@@ -22,38 +17,22 @@ public class ApiController {
     public ApiController(SortContext sortContext) {
         this.sortContext = sortContext;
     }
-    @PostMapping("/bubblesort")
-    public String bubbleSort(@RequestBody SortRequest request) {
-        int n = request.getN();
-        List<Object> inputArray = request.getArray();
 
-        if (inputArray.isEmpty()) {
-            throw new IllegalArgumentException("Array cannot be empty");
-        }
-
-        if (inputArray.get(0) instanceof Integer) {
-            int[] intArray = inputArray.stream().mapToInt(obj -> (Integer) obj).toArray();
-            return BubbleSort.sort(intArray, n);
-        } else if (inputArray.get(0) instanceof String) {
-            String[] stringArray = inputArray.stream().map(obj -> (String) obj).toArray(String[]::new);
-            return BubbleSort.sort(stringArray, n);
-        } else {
-            throw new IllegalArgumentException("Unsupported array type");
-        }
-    }
 
     @PostMapping("/sort")
-    public Map<String, JsonObject> sort(
+    public List<String> sort(
             @RequestParam String algorithms,
-            @RequestBody JsonObject requestBody
+            @RequestBody String requestBody
     ) {
 
         String[] algorithmList = algorithms.split(",");
 
-        Map<String, JsonObject> sortedResults = new LinkedHashMap<>();
+        List<String> sortedResults = new ArrayList<>();
+
+        JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
 
         for (String algorithm : algorithmList) {
-            sortedResults.put(algorithm, sortContext.sort(algorithm, requestBody));
+            sortedResults.add(sortContext.sort(algorithm, jsonObject));
         }
 
         return sortedResults;

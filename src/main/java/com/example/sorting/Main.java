@@ -18,18 +18,6 @@ public class Main {
         int[] numbers = {5, 3, 8, 4, 2};
         String[] strings = {"banana", "apple", "cherry"};
 
-        // Sortowanie za pomocą InsertionSort
-        String insertionSortedNumbersJson = InsertionSort.sort(numbers, numbers.length);
-        String insertionSortedStringsJson = InsertionSort.sort(strings, strings.length);
 
-        System.out.println("InsertionSorted Numbers JSON:\n" + insertionSortedNumbersJson);
-        System.out.println("InsertionSorted Strings JSON:\n" + insertionSortedStringsJson);
-
-        // Sortowanie w odwrotnej kolejności za pomocą InsertionSort
-        String insertionSortedNumbersReverseJson = InsertionSort.sortInReverse(numbers, numbers.length);
-        String insertionSortedStringsReverseJson = InsertionSort.sortInReverse(strings, strings.length);
-
-        System.out.println("InsertionSorted Numbers in Reverse JSON:\n" + insertionSortedNumbersReverseJson);
-        System.out.println("InsertionSorted Strings in Reverse JSON:\n" + insertionSortedStringsReverseJson);
     }
 }

@@ -19,7 +19,7 @@ public class SortContext {
         this.strategies = strategies;
     }
 
-    public JsonObject sort(String algorithm, JsonObject json) {
+    public String sort(String algorithm, JsonObject json) {
         SortJsonInterface strategy = strategies.get(algorithm);
         if (strategy != null) {
             return strategy.sort(json);

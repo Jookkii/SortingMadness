@@ -7,5 +7,5 @@ import com.google.gson.JsonObject;
 
 
 public interface SortJsonInterface {
-    public JsonObject sort(JsonObject obj);
+    public String sort(JsonObject obj);
 }
