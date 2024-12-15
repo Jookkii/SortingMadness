@@ -13,44 +13,84 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout kodu
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2. Skonfiguruj JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Debug environment variables
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 3. Skonfiguruj dane użytkownika Git
+      - name: Configure Git
         run: |
-          echo "Actor: ${{ github.actor }}"
-          echo "Repository: ${{ github.repository }}"
-          echo "Token length: ${#GITHUB_TOKEN}"
-          echo "Remote URL:"
-          git remote -v
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "actions@github.com"
 
-      - name: Configure HTTPS Git with GITHUB_TOKEN
+      # 4. Wymuś HTTPS jako zdalny adres
+      - name: Ensure HTTPS remote
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global credential.helper store
-          echo "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com" > ~/.git-credentials
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "actions@github.com"
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git remote set-url origin https://${GH_TOKEN}@github.com/${{ github.repository }}
           git remote -v
 
-      - name: Fetch all tags and branches
+      # 5. Skonfiguruj Maven settings.xml
+      - name: Configure Maven settings
         run: |
-          git fetch --all
-          git fetch --tags
+          mkdir -p ~/.m2
+          echo "<settings>
+                  <servers>
+                    <server>
+                      <id>github</id>
+                      <username>${{ github.actor }}</username>
+                      <password>${{ secrets.GITHUB_TOKEN }}</password>
+                    </server>
+                  </servers>
+                </settings>" > ~/.m2/settings.xml
 
+      # 6. Pobierz wszystkie tagi
+      - name: Fetch all tags
+        run: git fetch --tags
+
+      # 7. Maven Release
       - name: Maven Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
         run: |
           mvn release:prepare release:perform -B -X
+
+  create_release:
+    needs: release
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Pobierz kod
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Utwórz GitHub Release
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      # 3. Opcjonalnie: Dodaj artefakty do Release
+      - name: Upload JAR to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/SortingApp.jar
+          asset_name: SortingApp.jar
+          asset_content_type: application/java-archive
