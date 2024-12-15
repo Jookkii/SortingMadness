@@ -2,8 +2,8 @@ name: Maven Release and Build Workflow
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'SortingApp-*'
 
 permissions:
   contents: write
@@ -45,19 +45,6 @@ jobs:
         run: |
           mvn release:prepare release:perform -B -X
 
-      - name: Get last created tag
-        id: last_tag
-        run: |
-          LAST_TAG=$(git describe --tags --abbrev=0)
-          echo "LAST_TAG=$LAST_TAG" >> $GITHUB_ENV
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Debug last created tag
-        run: |
-          echo "Last created tag: $LAST_TAG"
-        env:
-          LAST_TAG: ${{ env.LAST_TAG }}
 
   create_release:
     needs: release
@@ -72,13 +59,12 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LAST_TAG: ${{ env.LAST_TAG }}
         with:
-          tag_name: ${{ env.LAST_TAG }}
-          release_name: "Release ${{ env.LAST_TAG }}"
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
 
