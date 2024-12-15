@@ -47,10 +47,17 @@ jobs:
 
       - name: Get last created tag
         id: last_tag
-        run: echo "LAST_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0)
+          echo "LAST_TAG=$LAST_TAG" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Debug last created tag
-        run: echo "Last created tag: ${{ env.LAST_TAG }}"
+        run: |
+          echo "Last created tag: $LAST_TAG"
+        env:
+          LAST_TAG: ${{ env.LAST_TAG }}
 
   create_release:
     needs: release
@@ -68,6 +75,7 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LAST_TAG: ${{ env.LAST_TAG }}
         with:
           tag_name: ${{ env.LAST_TAG }}
           release_name: "Release ${{ env.LAST_TAG }}"
