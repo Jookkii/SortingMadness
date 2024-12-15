@@ -3,7 +3,7 @@ name: Maven Release and Build Workflow
 on:
   push:
     branches:
-      - main # Workflow uruchamia się na push do gałęzi main
+      - main
 
 permissions:
   contents: write
@@ -13,88 +13,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout kodu
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Skonfiguruj JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Skonfiguruj dane użytkownika Git
-      - name: Configure Git
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "actions@github.com"
-
-      # 4. Wymuś HTTPS jako zdalny adres
-      - name: Ensure HTTPS remote
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git remote set-url origin https://${GH_TOKEN}@github.com/${{ github.repository }}
-          git remote -v
-
-      # 5. Skonfiguruj Maven settings.xml
-      - name: Configure Maven settings
-        run: |
-          mkdir -p ~/.m2
-          echo "<settings>
-                  <servers>
-                    <server>
-                      <id>github</id>
-                      <username>${{ github.actor }}</username>
-                      <password>${{ secrets.GITHUB_TOKEN }}</password>
-                    </server>
-                  </servers>
-                </settings>" > ~/.m2/settings.xml
-
-      # 6. Wymuś HTTPS dla GIT (zamiana SSH na HTTPS)
-      - name: Override GIT_SSH_COMMAND
-        run: |
-          git config core.sshCommand "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
-          git config --global url."https://github.com/".insteadOf ssh://git@github.com
-          git remote set-url origin https://github.com/${{ github.repository }}
-          git remote -v
-
-      # 7. Pobierz wszystkie tagi
-      - name: Fetch all tags
-        run: git fetch --tags
-
-      # 8. Usuń stan Maven release
-      - name: Clean Maven release state
-        run: |
-          rm -f release.properties
-
-      # 9. Debuguj zmienne środowiskowe
       - name: Debug environment variables
         run: |
           echo "Actor: ${{ github.actor }}"
           echo "Repository: ${{ github.repository }}"
-          echo "Token: ${{ secrets.GITHUB_TOKEN }}"
+          echo "Token length: ${#secrets.GITHUB_TOKEN}"
+          echo "Remote URL:"
+          git remote -v
 
-      # 10. Uruchom Maven Release Plugin
+      - name: Configure HTTPS Git
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global credential.helper store
+          echo "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com" > ~/.git-credentials
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "actions@github.com"
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git remote -v
+
+      - name: Fetch all tags and branches
+        run: |
+          git fetch --all
+          git fetch --tags
+
       - name: Maven Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
         run: |
           mvn release:prepare release:perform -B -X
-
-      # 11. Buduj projekt po release
-      - name: Build Project
-        run: mvn clean install
-
-      # 12. Opcjonalnie: Przesyłanie artefaktu do GitHub Release
-      - name: Upload JAR to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: target/SortingApp.jar
-          asset_name: SortingApp.jar
-          asset_content_type: application/java-archive
