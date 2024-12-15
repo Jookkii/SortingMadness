@@ -1,11 +1,15 @@
 package com.example.sorting.service;
 
+import com.example.sorting.controller.ApiController;
 import com.google.gson.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
+
 
 /**
  * Klasa zawierająca metody sortujące algorytmem bubble sort
@@ -16,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Component("bubblesort")
 public class BubbleSort implements SortJsonInterface {
-
+    private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
     private static class SortResult<T> {
         private long executionTime;
@@ -58,17 +62,17 @@ public class BubbleSort implements SortJsonInterface {
         int n = request.n;
         boolean isReverse = request.isReverse;
         String key = request.key;
-
+        logger.info("wypakowano jsona");
         if (listElement == null || !listElement.isJsonArray()) {
             throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
         }
-
+        logger.debug("Json był kompletny");
         JsonArray jsonArray = listElement.getAsJsonArray();
-
+        logger.debug("Stworzono json array");
         if (jsonArray.size() == 0) {
             return gson.toJson(new int[0]);
         }
-
+        logger.info("rozpoczęto sortowanie");
         JsonElement firstElement = jsonArray.get(0);
 
         if (firstElement.isJsonPrimitive()) {
