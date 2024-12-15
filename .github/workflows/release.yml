@@ -40,7 +40,15 @@ jobs:
         id: extract_version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Extracted version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # 5. Debuguj wyodrębnioną wersję
+      - name: Debug extracted version
+        run: |
+          echo "Extracted version: $VERSION"
+        env:
+          VERSION: ${{ env.VERSION }}
 
       # 6. Skonfiguruj HTTPS Git z tokenem
       - name: Configure HTTPS Git with GITHUB_TOKEN
@@ -84,8 +92,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
+          tag_name: SortingApp-${{ env.VERSION }}
+          release_name: Release SortingApp-${{ env.VERSION }}
           draft: false
           prerelease: false
 
