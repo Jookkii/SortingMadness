@@ -18,7 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-
       - name: Debug Git branch
         run: |
           echo "Current branch:"
