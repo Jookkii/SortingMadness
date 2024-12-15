@@ -88,6 +88,12 @@
                 <version>3.0.0-M5</version>
                 <configuration>
                     <pushChanges>true</pushChanges>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <serverId>github</serverId>
+                    <scm>
+                        <connection>scm:git:https://github.com/Jookkii/SortingMadness.git</connection>
+                        <developerConnection>scm:git:https://github.com/Jookkii/SortingMadness.git</developerConnection>
+                    </scm>
                 </configuration>
             </plugin>
 
