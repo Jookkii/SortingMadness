@@ -1,5 +1,6 @@
 package com.example.sorting.controller;
 
+import com.example.sorting.dto.SortResult;
 import com.example.sorting.service.*;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -20,22 +21,27 @@ public class ApiController {
 
 
     @PostMapping("/sort")
-    public List<String> sort(
+    public List<SortResult> sort(
             @RequestParam String algorithms,
             @RequestBody String requestBody
     ) {
-
         String[] algorithmList = algorithms.split(",");
-
-        List<String> sortedResults = new ArrayList<>();
-
+        List<SortResult> results = new ArrayList<>();
         JsonObject jsonObject = JsonParser.parseString(requestBody).getAsJsonObject();
 
         for (String algorithm : algorithmList) {
-            sortedResults.add(sortContext.sort(algorithm, jsonObject));
+            String sortedArrayJson = sortContext.sort(algorithm, jsonObject);
+
+            JsonObject sortedResult = JsonParser.parseString(sortedArrayJson).getAsJsonObject();
+            List<String> sortedArray = new ArrayList<>();
+            sortedResult.getAsJsonArray("sortedArray").forEach(element -> sortedArray.add(element.getAsString()));
+
+            long executionTime = sortedResult.get("executionTime").getAsLong();
+
+            results.add(new SortResult(algorithm, executionTime, sortedArray));
         }
 
-        return sortedResults;
+        return results;
     }
 
 
