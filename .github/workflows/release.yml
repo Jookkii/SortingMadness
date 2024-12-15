@@ -26,7 +26,7 @@ jobs:
         run: |
           echo "Actor: ${{ github.actor }}"
           echo "Repository: ${{ github.repository }}"
-          echo "Token length: ${#secrets.GITHUB_TOKEN}"
+          echo "Token length: ${#GITHUB_TOKEN}"
           echo "Remote URL:"
           git remote -v
 
