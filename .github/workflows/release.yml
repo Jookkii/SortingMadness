@@ -16,7 +16,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
+
+      - name: Fetch all history
+        run: git fetch --unshallow
+
+      - name: Debug Git branch
+        run: |
+          echo "Current branch:"
+          git branch
+          echo "HEAD:"
+          git rev-parse HEAD
+
+      - name: Checkout main branch
+        run: git checkout main
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -34,47 +48,9 @@ jobs:
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git remote -v
 
-      - name: Fetch all tags and branches
-        run: |
-          git fetch --all
-          git fetch --tags
-
       - name: Maven Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
         run: |
           mvn release:prepare release:perform -B -X
-
-
-  create_release:
-    needs: release
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Fetch tags
-        run: git fetch --tags
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-
-      - name: Upload JAR to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/SortingApp.jar
-          asset_name: SortingApp.jar
-          asset_content_type: application/java-archive
