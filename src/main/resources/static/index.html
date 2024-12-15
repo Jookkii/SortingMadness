@@ -16,35 +16,73 @@
             height: 100px;
             margin-bottom: 10px;
         }
+        .algorithm-buttons{
+            margin-bottom: 10px;
+        }
+        .algorithm {
+            border-radius: 10px;
+            padding: 5px 10px;
+            margin: 5px;
+            border: 1px solid #007bff;
+            background-color: white;
+            color: #000000;
+        }
+        .algorithm.active {
+            background-color: #94bde87a;
+            color: #000000;
+        }
     </style>
     <script>
+        const selectedAlgorithms = new Set();
+
+        function toggleAlgorithm(algorithm,buttonElement) {
+            buttonElement.classList.toggle('active');
+
+            if (selectedAlgorithms.has(algorithm)) {
+                selectedAlgorithms.delete(algorithm);
+            } else {
+                selectedAlgorithms.add(algorithm);
+            }
+        }
+
         function sendJson() {
             const jsonInput = document.getElementById('json-input').value;
-            const sortName = document.getElementById('sortName').value;
+
+            if (selectedAlgorithms.size === 0) {
+                alert('Wybierz przynajmniej jeden algorytm.');
+                return;
+            }
 
             let jsonData;
 
             try {
                 jsonData = JSON.parse(jsonInput);
             } catch (error) {
-                alert('Invalid JSON format. Please correct it and try again.');
+                alert('Niepoprawny format JSON.');
                 return;
             }
 
-            fetch(`/${sortName}`, {
+            const queryParams = Array.from(selectedAlgorithms).join(',');
+
+            fetch(`/sort?algorithms=${queryParams}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(jsonData)
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Błąd podczas komunikacji z API.');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     document.getElementById('api-response').innerText = JSON.stringify(data, null, 2);
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    document.getElementById('api-response').innerText = 'Error: ' + error;
+                    document.getElementById('api-response').innerText = 'Error: ' + error.message;
                 });
         }
 
@@ -55,20 +93,22 @@
 <p><strong>Enter JSON to send to the API:</strong></p>
 <textarea id="json-input">
 {
-  "n": 6,
-  "array": [2, 5, 1, 7, 9, 0]
+    "list": [5,10,2,18,0,6,-3,25],
+    "n": 4,
+    "isReverse": false,
+    "key": null
 }
 </textarea>
-<select id="sortName">
-    <option value="bubblesort">bubel</option>
-    <option value="insertionsort">insert</option>
-<!--    <option value="mergesort">bubel</option>-->
-<!--    <option value="quicksort">insert</option>-->
-<!--    <option value="selectionsort">bubel</option>-->
-<!--    <option value="shellsort">insert</option>-->
-</select>
-<button id="send-json-button" onclick="sendJson()">Send JSON</button>
-<p><strong>Response from API:</strong></p>
-<pre id="api-response">Waiting for response...</pre>
+<div class="algorithm-buttons">
+    <button class="algorithm" onclick="toggleAlgorithm('bubblesort', this)">Bubble Sort</button>
+    <button class="algorithm" onclick="toggleAlgorithm('insertionsort', this)">Insertion Sort</button>
+    <button class="algorithm" onclick="toggleAlgorithm('mergesort', this)">Merge Sort</button>
+    <button class="algorithm" onclick="toggleAlgorithm('quicksort', this)">Quick Sort</button>
+    <button class="algorithm" onclick="toggleAlgorithm('selectionsort', this)">Selection Sort</button>
+    <button class="algorithm" onclick="toggleAlgorithm('shellsort', this)">Shell Sort</button>
+</div>
+<button id="send-json-button" onclick="sendJson()">Wyślij JSON</button>
+<p><strong>Odpowiedź z API:</strong></p>
+<pre id="api-response">Czekam na odpowiedź...</pre>
 </body>
 </html>
