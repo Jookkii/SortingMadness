@@ -89,6 +89,7 @@
                 <configuration>
                     <pushChanges>true</pushChanges>
                     <useReleaseProfile>false</useReleaseProfile>
+                    <goals>clean verify</goals>
                     <serverId>github</serverId>
                     <scm>
                         <connection>scm:git:https://github.com/Jookkii/SortingMadness.git</connection>
