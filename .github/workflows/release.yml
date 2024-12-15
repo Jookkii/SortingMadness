@@ -18,8 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch all history
-        run: git fetch --unshallow
 
       - name: Debug Git branch
         run: |
