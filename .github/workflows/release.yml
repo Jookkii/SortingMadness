@@ -42,7 +42,10 @@ jobs:
 
       # 5. Debuguj wyodrębnioną wersję
       - name: Debug normalized version
-        run: echo "Normalized version: ${{ env.NORMALIZED_VERSION }}"
+        run: |
+          echo "Normalized version: $VERSION"
+        env:
+          VERSION: ${{ env.NORMALIZED_VERSION }}  
 
       # 6. Skonfiguruj HTTPS Git z tokenem
       - name: Configure HTTPS Git with GITHUB_TOKEN
