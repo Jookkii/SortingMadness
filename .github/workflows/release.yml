@@ -42,10 +42,6 @@ jobs:
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      # 5. Debuguj wyodrębnioną wersję
-      - name: Debug extracted version
-        run: echo "Extracted version: ${{ env.VERSION }}"
-
       # 6. Skonfiguruj HTTPS Git z tokenem
       - name: Configure HTTPS Git with GITHUB_TOKEN
         env:
