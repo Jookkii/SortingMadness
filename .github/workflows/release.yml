@@ -13,41 +13,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout kodu
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Skonfiguruj JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Wyodrębnij wersję z pom.xml
-      - name: Extract version from pom.xml
-        id: extract_version
-        run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "Extracted version: $VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      # 4. Normalizuj wersję dla tagów
-      - name: Normalize version for tag
-        id: normalize_version
-        run: |
-          NORMALIZED_VERSION=$(echo "${{ env.VERSION }}" | sed 's/-SNAPSHOT//g')
-          echo "Normalized version: $NORMALIZED_VERSION"
-          echo "NORMALIZED_VERSION=$NORMALIZED_VERSION" >> $GITHUB_ENV
-
-      # 5. Debuguj wyodrębnioną wersję
-      - name: Debug normalized version
-        run: |
-          echo "Normalized version: $VERSION"
+      - name: Debug environment variables
         env:
-          VERSION: ${{ env.NORMALIZED_VERSION }}  
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Actor: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Token length: ${#GITHUB_TOKEN}"
+          echo "Remote URL:"
+          git remote -v
 
-      # 6. Skonfiguruj HTTPS Git z tokenem
       - name: Configure HTTPS Git with GITHUB_TOKEN
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,13 +43,11 @@ jobs:
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git remote -v
 
-      # 7. Pobierz wszystkie tagi i gałęzie
       - name: Fetch all tags and branches
         run: |
           git fetch --all
           git fetch --tags
 
-      # 8. Maven Release
       - name: Maven Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -73,32 +55,35 @@ jobs:
         run: |
           mvn release:prepare release:perform -B -X
 
-      # 9. Debuguj utworzone tagi
-      - name: Debug created tags
-        run: git tag
+      - name: List tags after Maven Release
+        run: git tag -l
+
+      - name: Get last created tag
+        id: last_tag
+        run: echo "LAST_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
 
   create_release:
     needs: release
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout kodu
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Utwórz GitHub Release
+      - name: Fetch tags
+        run: git fetch --tags
+
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "SortingApp-${{ env.NORMALIZED_VERSION }}"
-          release_name: "Release SortingApp-${{ env.NORMALIZED_VERSION }}"
+          tag_name: ${{ env.LAST_TAG }}
+          release_name: Release ${{ env.LAST_TAG }}
           draft: false
           prerelease: false
 
-      # 3. Dodaj artefakty do Release
       - name: Upload JAR to Release
         uses: actions/upload-release-asset@v1
         env:
