@@ -23,6 +23,8 @@ jobs:
           distribution: 'temurin'
 
       - name: Debug environment variables
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Actor: ${{ github.actor }}"
           echo "Repository: ${{ github.repository }}"
@@ -30,7 +32,7 @@ jobs:
           echo "Remote URL:"
           git remote -v
 
-      - name: Configure HTTPS Git
+      - name: Configure HTTPS Git with GITHUB_TOKEN
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
