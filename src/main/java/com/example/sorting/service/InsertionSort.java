@@ -13,6 +13,13 @@ import com.google.gson.JsonObject;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * Klasa zawierająca metody sortujące algorytmem insertion sort
+ *
+ * @author ML
+ * @version 1.0
+ */
+
 @Component("insertionsort")
 public class InsertionSort implements SortJsonInterface {
 
@@ -61,6 +68,12 @@ public class InsertionSort implements SortJsonInterface {
         String key;
     }
 
+    /**
+     * Metoda "rozpakowująca" strukturę JSON i używająca jednej z dwóch metod w sortL w zależności od tego czy dana lista ma dane typu String czy int
+     *
+     * @param jsonInput JSON zawierający listę do posortowania, liczbę iteracji oraz informację o tym, w którą stronę idzie sortowanie.
+     * @return Posortowana lista i czas wykonania sortowania.
+     */
     public String sort(JsonObject jsonInput) {
         InsertionSort.SortRequest request = gson.fromJson(jsonInput, InsertionSort.SortRequest.class);
 
@@ -96,6 +109,14 @@ public class InsertionSort implements SortJsonInterface {
         throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
     }
 
+    /**
+     * Metoda sortująca listy integerów
+     *
+     * @param l Nieposortowana lista integerów
+     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
+     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
+     * @return Posortowana lista i czas sortowania
+     */
     public static String sortL(int[] l, int n, boolean isReverse) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResultPrimitive(0L, l));
@@ -121,7 +142,14 @@ public class InsertionSort implements SortJsonInterface {
         return gson.toJson(sortResult);
     }
 
-
+    /**
+     * Metoda sortująca listy Stringów
+     *
+     * @param l Nieposortowana lista Stringów
+     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
+     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
+     * @return Posortowana lista i czas sortowania jako
+     */
     public static String sortL(String[] l, int n, boolean isReverse) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));

@@ -1,6 +1,7 @@
 com\example\sorting\dto\SortRequest.class
 com\example\sorting\service\QuickSort$SortResult.class
 com\example\sorting\service\MergeSort$SortResult.class
+com\example\sorting\dto\SortResult.class
 com\example\sorting\service\SelectionSort$SortRequest.class
 com\example\sorting\service\ShellSort.class
 com\example\sorting\service\InsertionSort$SortRequest.class

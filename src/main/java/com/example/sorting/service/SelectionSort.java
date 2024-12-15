@@ -8,6 +8,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import org.springframework.stereotype.Component;
 
+/**
+ * Klasa zawierająca metody sortujące algorytmem selection sort
+ *
+ * @author ML
+ * @version 1.0
+ */
+
 @Component("selectionsort")
 public class SelectionSort implements SortJsonInterface {
 
@@ -38,6 +45,12 @@ public class SelectionSort implements SortJsonInterface {
         String key;
     }
 
+    /**
+     * Metoda "rozpakowująca" strukturę JSON i używająca jednej z dwóch metod w sortL w zależności od tego czy dana lista ma dane typu String czy int
+     *
+     * @param jsonInput JSON zawierający listę do posortowania, liczbę iteracji oraz informację o tym, w którą stronę idzie sortowanie.
+     * @return Posortowana lista i czas wykonania sortowania.
+     */
     public String sort(JsonObject jsonInput) {
         SelectionSort.SortRequest request = gson.fromJson(jsonInput, SelectionSort.SortRequest.class);
 
@@ -73,6 +86,14 @@ public class SelectionSort implements SortJsonInterface {
         throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
     }
 
+    /**
+     * Metoda sortująca listy integerów
+     *
+     * @param l Nieposortowana lista integerów
+     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
+     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
+     * @return Posortowana lista i czas sortowania
+     */
     public static String sortL(int[] l, int n, boolean isReverse) {
         if (l == null || l.length == 0) {
             SortResult<int[]> sortResult = new SortResult<>(0L, l);
@@ -104,6 +125,14 @@ public class SelectionSort implements SortJsonInterface {
         return gson.toJson(sortResult);
     }
 
+    /**
+     * Metoda sortująca listy Stringów
+     *
+     * @param l Nieposortowana lista Stringów
+     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
+     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
+     * @return Posortowana lista i czas sortowania jako
+     */
     public static String sortL(String[] l, int n, boolean isReverse) {
         if (l == null || l.length == 0) {
             SortResult<String[]> sortResult = new SortResult<>(0L, l);
