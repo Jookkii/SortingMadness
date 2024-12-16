@@ -3,7 +3,6 @@ package com.example.sorting.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
  * @author ML
  * @version 1.0
  */
-
 @Component("selectionsort")
 public class SelectionSort implements SortJsonInterface {
 
@@ -52,38 +50,54 @@ public class SelectionSort implements SortJsonInterface {
      * @return Posortowana lista i czas wykonania sortowania.
      */
     public String sort(JsonObject jsonInput) {
-        SelectionSort.SortRequest request = gson.fromJson(jsonInput, SelectionSort.SortRequest.class);
+        try {
+            SelectionSort.SortRequest request = gson.fromJson(jsonInput, SelectionSort.SortRequest.class);
 
-        JsonElement listElement = request.list;
-        int n = request.n;
-        boolean isReverse = request.isReverse;
-        String key = request.key;
+            JsonElement listElement = request.list;
+            int n = request.n;
+            boolean isReverse = request.isReverse;
+            String key = request.key;
 
-        if (listElement == null || !listElement.isJsonArray()) {
-            throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
-        }
-
-        JsonArray jsonArray = listElement.getAsJsonArray();
-
-        if (jsonArray.size() == 0) {
-            return gson.toJson(new int[0]);
-        }
-
-        JsonElement firstElement = jsonArray.get(0);
-
-        if (firstElement.isJsonPrimitive()) {
-            if (firstElement.getAsJsonPrimitive().isNumber()) {
-                int[] inputArray = gson.fromJson(jsonArray, int[].class);
-                return sortL(inputArray, n, isReverse);
+            if (listElement == null || !listElement.isJsonArray()) {
+                throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
             }
 
-            if (firstElement.getAsJsonPrimitive().isString()) {
-                String[] inputArray = gson.fromJson(jsonArray, String[].class);
-                return sortL(inputArray, n, isReverse);
-            }
-        }
+            JsonArray jsonArray = listElement.getAsJsonArray();
 
-        throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
+            if (jsonArray.size() == 0) {
+                return gson.toJson(new int[0]);
+            }
+
+            JsonElement firstElement = jsonArray.get(0);
+
+            if (firstElement.isJsonPrimitive()) {
+                if (firstElement.getAsJsonPrimitive().isNumber()) {
+                    int[] inputArray = gson.fromJson(jsonArray, int[].class);
+                    return sortL(inputArray, n, isReverse);
+                }
+
+                if (firstElement.getAsJsonPrimitive().isString()) {
+                    String[] inputArray = gson.fromJson(jsonArray, String[].class);
+                    return sortL(inputArray, n, isReverse);
+                }
+            }
+
+            throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
+        } catch (Exception e) {
+            return createErrorResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * Funkcja tworząca odpowiedź błędu w formacie JSON
+     *
+     * @param message Wiadomość o błędzie
+     * @return JSON zawierający informacje o błędzie
+     */
+    private String createErrorResponse(String message) {
+        JsonObject errorResponse = new JsonObject();
+        errorResponse.addProperty("error", message);
+        return gson.toJson(errorResponse);
     }
 
     /**
@@ -163,5 +177,4 @@ public class SelectionSort implements SortJsonInterface {
         SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
-
 }

@@ -1,1 +1,0 @@
-memberSearchIndex = [{"p":"com.example.sorting","c":"MainTest","l":"MainTest()","u":"%3Cinit%3E()"},{"p":"com.example.sorting","c":"MainTest2","l":"MainTest2()","u":"%3Cinit%3E()"},{"p":"com.example.sorting","c":"MainTest","l":"testMain()"},{"p":"com.example.sorting","c":"MainTest2","l":"testMain()"}];updateSearchResults();
