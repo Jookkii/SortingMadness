@@ -5,13 +5,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Klasa zawierająca metody sortujące algorytmem merge sort
+ *
+ * @author ML
+ * @version 1.0
+ */
 @Component("mergesort")
 public class MergeSort implements SortJsonInterface {
-
 
     private static class SortResult<T> {
         private long executionTime;
@@ -40,42 +43,67 @@ public class MergeSort implements SortJsonInterface {
         String key;
     }
 
+    /**
+     * Metoda "rozpakowująca" strukturę JSON i używająca jednej z dwóch metod w sortL w zależności od tego czy dana lista ma dane typu String czy int
+     *
+     * @param jsonInput JSON zawierający listę do posortowania, liczbę iteracji oraz informację o tym, w którą stronę idzie sortowanie.
+     * @return Posortowana lista i czas wykonania sortowania.
+     */
     public String sort(JsonObject jsonInput) {
-        MergeSort.SortRequest request = gson.fromJson(jsonInput, MergeSort.SortRequest.class);
+        try {
+            MergeSort.SortRequest request = gson.fromJson(jsonInput, MergeSort.SortRequest.class);
 
-        JsonElement listElement = request.list;
-        int n = request.n;
-        boolean isReverse = request.isReverse;
-        String key = request.key;
+            JsonElement listElement = request.list;
+            int n = request.n;
+            boolean isReverse = request.isReverse;
+            String key = request.key;
 
-        if (listElement == null || !listElement.isJsonArray()) {
-            throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
-        }
-
-        JsonArray jsonArray = listElement.getAsJsonArray();
-
-        if (jsonArray.size() == 0) {
-            return gson.toJson(new int[0]);
-        }
-
-        JsonElement firstElement = jsonArray.get(0);
-
-        if (firstElement.isJsonPrimitive()) {
-            if (firstElement.getAsJsonPrimitive().isNumber()) {
-                int[] inputArray = gson.fromJson(jsonArray, int[].class);
-                return sortL(inputArray, n, isReverse);
+            if (listElement == null || !listElement.isJsonArray()) {
+                throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
             }
 
-            if (firstElement.getAsJsonPrimitive().isString()) {
-                String[] inputArray = gson.fromJson(jsonArray, String[].class);
-                return sortL(inputArray, n, isReverse);
-            }
-        }
+            JsonArray jsonArray = listElement.getAsJsonArray();
 
-        throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
+            if (jsonArray.size() == 0) {
+                return gson.toJson(new int[0]);
+            }
+
+            JsonElement firstElement = jsonArray.get(0);
+
+            if (firstElement.isJsonPrimitive()) {
+                if (firstElement.getAsJsonPrimitive().isNumber()) {
+                    int[] inputArray = gson.fromJson(jsonArray, int[].class);
+                    return sortL(inputArray, n, isReverse);
+                }
+
+                if (firstElement.getAsJsonPrimitive().isString()) {
+                    String[] inputArray = gson.fromJson(jsonArray, String[].class);
+                    return sortL(inputArray, n, isReverse);
+                }
+            }
+
+            throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
+        } catch (Exception e) {
+            return createErrorResponse(e.getMessage());
+        }
+    }
+
+    /**
+     * Funkcja tworząca odpowiedź błędu w formacie JSON
+     *
+     * @param message Wiadomość o błędzie
+     * @return JSON zawierający informacje o błędzie
+     */
+    private String createErrorResponse(String message) {
+        JsonObject errorResponse = new JsonObject();
+        errorResponse.addProperty("error", message);
+        return gson.toJson(errorResponse);
     }
 
     public static String sortL(int[] l, int n, boolean isReverse) {
+        if (l == null || l.length == 0) {
+            return gson.toJson(new SortResult<>(0L, l));
+        }
         if (n > l.length) n = l.length;
         int[] result = l.clone();
         long startTime = System.nanoTime();
@@ -101,6 +129,9 @@ public class MergeSort implements SortJsonInterface {
     }
 
     public static String sortL(String[] l, int n, boolean isReverse) {
+        if (l == null || l.length == 0) {
+            return gson.toJson(new SortResult<>(0L, l));
+        }
         if (n > l.length) n = l.length;
         String[] result = l.clone();
         long startTime = System.nanoTime();
@@ -124,7 +155,6 @@ public class MergeSort implements SortJsonInterface {
         SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
         return gson.toJson(sortResult);
     }
-
 
     private static void merge(int[] l, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
