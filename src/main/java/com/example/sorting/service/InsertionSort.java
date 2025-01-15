@@ -1,16 +1,10 @@
 package com.example.sorting.service;
 
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Klasa zawierająca metody sortujące algorytmem insertion sort
@@ -18,9 +12,10 @@ import org.springframework.stereotype.Component;
  * @author ML
  * @version 1.0
  */
-
 @Component("insertionsort")
 public class InsertionSort implements SortJsonInterface {
+
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private static class SortResult<T> {
         private long executionTime;
@@ -30,117 +25,94 @@ public class InsertionSort implements SortJsonInterface {
             this.executionTime = executionTime;
             this.sortedArray = sortedArray;
         }
-
-        public long getExecutionTime() {
-            return executionTime;
-        }
-
-        public T getSortedArray() {
-            return sortedArray;
-        }
     }
 
-    private static class SortResultPrimitive {
-        private long executionTime;
-        private int[] sortedArray;
-
-        public SortResultPrimitive(long executionTime, int[] sortedArray) {
-            this.executionTime = executionTime;
-            this.sortedArray = sortedArray;
-        }
-
-        public long getExecutionTime() {
-            return executionTime;
-        }
-
-        public int[] getSortedArray() {
-            return sortedArray;
-        }
-    }
-
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-    private static class SortRequest<T> {
+    private static class SortRequest {
         JsonElement list;
         int n;
         boolean isReverse;
         String key;
     }
 
-    /**
-     * Metoda "rozpakowująca" strukturę JSON i używająca jednej z dwóch metod w sortL w zależności od tego czy dana lista ma dane typu String czy int
-     *
-     * @param jsonInput JSON zawierający listę do posortowania, liczbę iteracji oraz informację o tym, w którą stronę idzie sortowanie.
-     * @return Posortowana lista i czas wykonania sortowania.
-     */
+    @Override
     public String sort(JsonObject jsonInput) {
         try {
-            InsertionSort.SortRequest request = gson.fromJson(jsonInput, InsertionSort.SortRequest.class);
+            SortRequest request = gson.fromJson(jsonInput, SortRequest.class);
 
-            JsonElement listElement = request.list;
-            int n = request.n;
-            boolean isReverse = request.isReverse;
-            String key = request.key;
-
-            if (listElement == null || !listElement.isJsonArray()) {
+            if (request.list == null || !request.list.isJsonArray()) {
                 throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
             }
 
-            JsonArray jsonArray = listElement.getAsJsonArray();
+            JsonArray jsonArray = request.list.getAsJsonArray();
+            String key = request.key;
+            boolean isReverse = request.isReverse;
 
             if (jsonArray.size() == 0) {
-                return gson.toJson(new int[0]);
+                return gson.toJson(new SortResult<>(0L, new ArrayList<>()));
             }
 
             JsonElement firstElement = jsonArray.get(0);
 
-            if (firstElement.isJsonPrimitive()) {
+            if (firstElement.isJsonObject() && key != null && !key.isEmpty()) {
+                List<JsonObject> objectList = new ArrayList<>();
+                jsonArray.forEach(el -> objectList.add(el.getAsJsonObject()));
+                return sortObjects(objectList, key, isReverse);
+            } else if (firstElement.isJsonPrimitive()) {
                 if (firstElement.getAsJsonPrimitive().isNumber()) {
                     int[] inputArray = gson.fromJson(jsonArray, int[].class);
-                    return sortL(inputArray, n, isReverse);
-                }
-
-                if (firstElement.getAsJsonPrimitive().isString()) {
+                    return sortL(inputArray, isReverse);
+                } else if (firstElement.getAsJsonPrimitive().isString()) {
                     String[] inputArray = gson.fromJson(jsonArray, String[].class);
-                    return sortL(inputArray, n, isReverse);
+                    return sortL(inputArray, isReverse);
                 }
             }
 
-            throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
+            throw new IllegalArgumentException("Unsupported data type or missing key for object sorting.");
         } catch (Exception e) {
             return createErrorResponse(e.getMessage());
         }
     }
 
-    /**
-     * Funkcja tworząca odpowiedź błędu w formacie JSON
-     *
-     * @param message Wiadomość o błędzie
-     * @return JSON zawierający informacje o błędzie
-     */
+    private String sortObjects(List<JsonObject> objectList, String key, boolean isReverse) {
+        long startTime = System.nanoTime();
+
+        for (int i = 1; i < objectList.size(); i++) {
+            JsonObject keyObject = objectList.get(i);
+            int j = i - 1;
+
+            while (j >= 0) {
+                String value1 = objectList.get(j).get(key).getAsString();
+                String value2 = keyObject.get(key).getAsString();
+
+                if (isReverse ? value1.compareTo(value2) < 0 : value1.compareTo(value2) > 0) {
+                    objectList.set(j + 1, objectList.get(j));
+                    j--;
+                } else {
+                    break;
+                }
+            }
+            objectList.set(j + 1, keyObject);
+        }
+
+        long elapsedTime = System.nanoTime() - startTime;
+        return gson.toJson(new SortResult<>(elapsedTime, objectList));
+    }
+
     private String createErrorResponse(String message) {
         JsonObject errorResponse = new JsonObject();
         errorResponse.addProperty("error", message);
         return gson.toJson(errorResponse);
     }
 
-    /**
-     * Metoda sortująca listy integerów
-     *
-     * @param l Nieposortowana lista integerów
-     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
-     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
-     * @return Posortowana lista i czas sortowania
-     */
-    public static String sortL(int[] l, int n, boolean isReverse) {
+    public String sortL(int[] l, boolean isReverse) {
         if (l == null || l.length == 0) {
-            return gson.toJson(new SortResultPrimitive(0L, l));
+            return gson.toJson(new SortResult<>(0L, l));
         }
-        if (n > l.length) n = l.length;
+
         int[] result = l.clone();
         long startTime = System.nanoTime();
 
-        for (int i = 1; i < n; i++) {
+        for (int i = 1; i < result.length; i++) {
             int key = result[i];
             int j = i - 1;
             while (j >= 0 && (isReverse ? result[j] < key : result[j] > key)) {
@@ -150,30 +122,19 @@ public class InsertionSort implements SortJsonInterface {
             result[j + 1] = key;
         }
 
-        long endTime = System.nanoTime();
-        long executionTime = endTime - startTime;
-
-        SortResultPrimitive sortResult = new SortResultPrimitive(executionTime, result);
-        return gson.toJson(sortResult);
+        long elapsedTime = System.nanoTime() - startTime;
+        return gson.toJson(new SortResult<>(elapsedTime, result));
     }
 
-    /**
-     * Metoda sortująca listy Stringów
-     *
-     * @param l Nieposortowana lista Stringów
-     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
-     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
-     * @return Posortowana lista i czas sortowania jako
-     */
-    public static String sortL(String[] l, int n, boolean isReverse) {
+    public String sortL(String[] l, boolean isReverse) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-        if (n > l.length) n = l.length;
+
         String[] result = l.clone();
         long startTime = System.nanoTime();
 
-        for (int i = 1; i < n; i++) {
+        for (int i = 1; i < result.length; i++) {
             String key = result[i];
             int j = i - 1;
             while (j >= 0 && (isReverse ? result[j].compareTo(key) < 0 : result[j].compareTo(key) > 0)) {
@@ -183,11 +144,7 @@ public class InsertionSort implements SortJsonInterface {
             result[j + 1] = key;
         }
 
-        long endTime = System.nanoTime();
-        long executionTime = endTime - startTime;
-
-        SortResult<String[]> sortResult = new SortResult<>(executionTime, result);
-        return gson.toJson(sortResult);
+        long elapsedTime = System.nanoTime() - startTime;
+        return gson.toJson(new SortResult<>(elapsedTime, result));
     }
-
 }

@@ -2,12 +2,12 @@ package com.example.sorting.service;
 
 import com.example.sorting.controller.ApiController;
 import com.google.gson.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Klasa zawierająca metody sortujące algorytmem bubble sort
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Component("bubblesort")
 public class BubbleSort implements SortJsonInterface {
     private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private static class SortResult<T> {
         private long executionTime;
@@ -37,8 +38,6 @@ public class BubbleSort implements SortJsonInterface {
         }
     }
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     private static class SortRequest {
         JsonElement list;
         int n;
@@ -46,19 +45,14 @@ public class BubbleSort implements SortJsonInterface {
         String key;
     }
 
-    /**
-     * Metoda "rozpakowująca" strukturę JSON i używająca jednej z dwóch metod w sortL w zależności od tego czy dana lista ma dane typu String czy int
-     *
-     * @param jsonInput JSON zawierający listę do posortowania, liczbę iteracji oraz informację o tym, w którą stronę idzie sortowanie.
-     * @return Posortowana lista i czas wykonania sortowania.
-     */
+    @Override
     public String sort(JsonObject jsonInput) {
         try {
             if (jsonInput == null || jsonInput.size() == 0) {
                 throw new IllegalArgumentException("Input JSON cannot be null or empty.");
             }
 
-            BubbleSort.SortRequest request = gson.fromJson(jsonInput, BubbleSort.SortRequest.class);
+            SortRequest request = gson.fromJson(jsonInput, SortRequest.class);
 
             if (request.list == null || !request.list.isJsonArray()) {
                 throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
@@ -67,60 +61,73 @@ public class BubbleSort implements SortJsonInterface {
             JsonArray jsonArray = request.list.getAsJsonArray();
             int n = Math.max(1, request.n); // Ensure n is at least 1
             boolean isReverse = request.isReverse;
+            String key = request.key;
 
             logger.info("Input JSON validated successfully.");
 
-            if (jsonArray.size() == 0) {
+            if (jsonArray.isEmpty()) {
                 logger.warn("Empty list provided, returning an empty result.");
                 return gson.toJson(new int[0]);
             }
 
             JsonElement firstElement = jsonArray.get(0);
-            if (firstElement.isJsonPrimitive()) {
+
+            if (firstElement.isJsonObject()) {
+                List<JsonObject> objectList = gson.fromJson(jsonArray, List.class);
+                return sortObjects(objectList, key, n, isReverse);
+            } else if (firstElement.isJsonPrimitive()) {
                 if (firstElement.getAsJsonPrimitive().isNumber()) {
                     int[] inputArray = gson.fromJson(jsonArray, int[].class);
                     return sortL(inputArray, n, isReverse);
                 } else if (firstElement.getAsJsonPrimitive().isString()) {
                     String[] inputArray = gson.fromJson(jsonArray, String[].class);
                     return sortL(inputArray, n, isReverse);
-                } else {
-                    throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
                 }
-            } else {
-                throw new IllegalArgumentException("List elements must be primitive types (numbers or strings).");
             }
-        } catch (JsonSyntaxException e) {
-            logger.error("JSON parsing error: {}", e.getMessage());
-            return createErrorResponse("Invalid JSON format.");
-        } catch (IllegalArgumentException e) {
-            logger.error("Validation error: {}", e.getMessage());
-            return createErrorResponse(e.getMessage());
+
+            throw new IllegalArgumentException("Unsupported data type in the list.");
         } catch (Exception e) {
-            logger.error("Unexpected error: {}", e.getMessage());
-            return createErrorResponse("An unexpected error occurred.");
+            logger.error("Error during sorting: {}", e.getMessage());
+            return createErrorResponse(e.getMessage());
         }
     }
 
-    /**
-     * Funkcja tworząca odpowiedź błędu w formacie JSON
-     *
-     * @param message Wiadomość o błędzie
-     * @return JSON zawierający informacje o błędzie
-     */
+    private String sortObjects(List<JsonObject> objectList, String key, int n, boolean isReverse) {
+        if (key == null || key.isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty for object sorting.");
+        }
+
+        long startTime = System.nanoTime();
+
+        for (int i = 0; i < n - 1; i++) {
+            boolean swapped = false;
+            for (int j = 0; j < objectList.size() - 1 - i; j++) {
+                JsonObject obj1 = objectList.get(j);
+                JsonObject obj2 = objectList.get(j + 1);
+
+                String value1 = obj1.get(key).getAsString();
+                String value2 = obj2.get(key).getAsString();
+
+                if (isReverse ? value1.compareTo(value2) < 0 : value1.compareTo(value2) > 0) {
+                    objectList.set(j, obj2);
+                    objectList.set(j + 1, obj1);
+                    swapped = true;
+                }
+            }
+            if (!swapped) break;
+        }
+
+        long elapsedTime = System.nanoTime() - startTime;
+
+        return gson.toJson(new SortResult<>(elapsedTime, objectList));
+    }
+
     private String createErrorResponse(String message) {
         JsonObject errorResponse = new JsonObject();
         errorResponse.addProperty("error", message);
         return gson.toJson(errorResponse);
     }
 
-    /**
-     * Metoda sortująca listy integerów
-     *
-     * @param l Nieposortowana lista integerów
-     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
-     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
-     * @return Posortowana lista i czas sortowania
-     */
     public static String sortL(int[] l, int n, boolean isReverse) {
         boolean swap;
         if (n > l.length) n = l.length;
@@ -145,14 +152,6 @@ public class BubbleSort implements SortJsonInterface {
         return gson.toJson(sortResult);
     }
 
-    /**
-     * Metoda sortująca listy Stringów
-     *
-     * @param l Nieposortowana lista Stringów
-     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
-     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
-     * @return Posortowana lista i czas sortowania jako
-     */
     public static String sortL(String[] l, int n, boolean isReverse) {
         boolean swap;
         if (n > l.length) n = l.length;

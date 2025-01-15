@@ -7,6 +7,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Klasa zawierająca metody sortujące algorytmem merge sort
  *
@@ -36,182 +40,193 @@ public class MergeSort implements SortJsonInterface {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private static class SortRequest<T> {
+    private static class SortRequest {
         JsonElement list;
-        int n;
         boolean isReverse;
         String key;
     }
 
-    /**
-     * Metoda "rozpakowująca" strukturę JSON i używająca jednej z dwóch metod w sortL w zależności od tego czy dana lista ma dane typu String czy int
-     *
-     * @param jsonInput JSON zawierający listę do posortowania, liczbę iteracji oraz informację o tym, w którą stronę idzie sortowanie.
-     * @return Posortowana lista i czas wykonania sortowania.
-     */
+    @Override
     public String sort(JsonObject jsonInput) {
         try {
-            MergeSort.SortRequest request = gson.fromJson(jsonInput, MergeSort.SortRequest.class);
+            SortRequest request = gson.fromJson(jsonInput, SortRequest.class);
 
-            JsonElement listElement = request.list;
-            int n = request.n;
-            boolean isReverse = request.isReverse;
-            String key = request.key;
-
-            if (listElement == null || !listElement.isJsonArray()) {
+            if (request.list == null || !request.list.isJsonArray()) {
                 throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
             }
 
-            JsonArray jsonArray = listElement.getAsJsonArray();
+            JsonArray jsonArray = request.list.getAsJsonArray();
+            String key = request.key;
+            boolean isReverse = request.isReverse;
 
             if (jsonArray.size() == 0) {
-                return gson.toJson(new int[0]);
+                return gson.toJson(new SortResult<>(0L, new ArrayList<>()));
             }
 
             JsonElement firstElement = jsonArray.get(0);
 
-            if (firstElement.isJsonPrimitive()) {
+            if (firstElement.isJsonObject() && key != null && !key.isEmpty()) {
+                List<JsonObject> objectList = new ArrayList<>();
+                jsonArray.forEach(el -> objectList.add(el.getAsJsonObject()));
+                return sortObjects(objectList, key, isReverse);
+            } else if (firstElement.isJsonPrimitive()) {
                 if (firstElement.getAsJsonPrimitive().isNumber()) {
                     int[] inputArray = gson.fromJson(jsonArray, int[].class);
-                    return sortL(inputArray, n, isReverse);
-                }
-
-                if (firstElement.getAsJsonPrimitive().isString()) {
+                    return sortL(inputArray, isReverse);
+                } else if (firstElement.getAsJsonPrimitive().isString()) {
                     String[] inputArray = gson.fromJson(jsonArray, String[].class);
-                    return sortL(inputArray, n, isReverse);
+                    return sortL(inputArray, isReverse);
                 }
             }
 
-            throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
+            throw new IllegalArgumentException("Unsupported data type or missing key for object sorting.");
         } catch (Exception e) {
             return createErrorResponse(e.getMessage());
         }
     }
 
-    /**
-     * Funkcja tworząca odpowiedź błędu w formacie JSON
-     *
-     * @param message Wiadomość o błędzie
-     * @return JSON zawierający informacje o błędzie
-     */
+    private String sortObjects(List<JsonObject> objectList, String key, boolean isReverse) {
+        long startTime = System.nanoTime();
+
+        List<JsonObject> sortedList = mergeSortObjects(objectList, key, isReverse);
+
+        long elapsedTime = System.nanoTime() - startTime;
+        return gson.toJson(new SortResult<>(elapsedTime, sortedList));
+    }
+
+    private List<JsonObject> mergeSortObjects(List<JsonObject> list, String key, boolean isReverse) {
+        if (list.size() <= 1) {
+            return list;
+        }
+
+        int mid = list.size() / 2;
+        List<JsonObject> left = mergeSortObjects(list.subList(0, mid), key, isReverse);
+        List<JsonObject> right = mergeSortObjects(list.subList(mid, list.size()), key, isReverse);
+
+        return mergeObjects(left, right, key, isReverse);
+    }
+
+    private List<JsonObject> mergeObjects(List<JsonObject> left, List<JsonObject> right, String key, boolean isReverse) {
+        List<JsonObject> merged = new ArrayList<>();
+        int i = 0, j = 0;
+
+        while (i < left.size() && j < right.size()) {
+            String leftValue = left.get(i).get(key).getAsString();
+            String rightValue = right.get(j).get(key).getAsString();
+
+            if ((isReverse && leftValue.compareTo(rightValue) > 0) || (!isReverse && leftValue.compareTo(rightValue) <= 0)) {
+                merged.add(left.get(i++));
+            } else {
+                merged.add(right.get(j++));
+            }
+        }
+
+        while (i < left.size()) {
+            merged.add(left.get(i++));
+        }
+
+        while (j < right.size()) {
+            merged.add(right.get(j++));
+        }
+
+        return merged;
+    }
+
     private String createErrorResponse(String message) {
         JsonObject errorResponse = new JsonObject();
         errorResponse.addProperty("error", message);
         return gson.toJson(errorResponse);
     }
 
-    public static String sortL(int[] l, int n, boolean isReverse) {
+    public String sortL(int[] l, boolean isReverse) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-        if (n > l.length) n = l.length;
-        int[] result = l.clone();
-        long startTime = System.nanoTime();
 
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
+        int[] result = mergeSortInt(l, isReverse);
 
-                if (isReverse) {
-                    merge(result, leftStart, mid, rightEnd, false);
-                } else {
-                    merge(result, leftStart, mid, rightEnd, true);
-                }
+        long elapsedTime = System.nanoTime();
+        return gson.toJson(new SortResult<>(elapsedTime, result));
+    }
+
+    private int[] mergeSortInt(int[] array, boolean isReverse) {
+        if (array.length <= 1) {
+            return array;
+        }
+
+        int mid = array.length / 2;
+        int[] left = mergeSortInt(Arrays.copyOfRange(array, 0, mid), isReverse);
+        int[] right = mergeSortInt(Arrays.copyOfRange(array, mid, array.length), isReverse);
+
+        return mergeInt(left, right, isReverse);
+    }
+
+    private int[] mergeInt(int[] left, int[] right, boolean isReverse) {
+        int[] merged = new int[left.length + right.length];
+        int i = 0, j = 0, k = 0;
+
+        while (i < left.length && j < right.length) {
+            if ((isReverse && left[i] > right[j]) || (!isReverse && left[i] <= right[j])) {
+                merged[k++] = left[i++];
+            } else {
+                merged[k++] = right[j++];
             }
         }
 
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
+        while (i < left.length) {
+            merged[k++] = left[i++];
+        }
 
-        SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
-        return gson.toJson(sortResult);
+        while (j < right.length) {
+            merged[k++] = right[j++];
+        }
+
+        return merged;
     }
 
-    public static String sortL(String[] l, int n, boolean isReverse) {
+    public String sortL(String[] l, boolean isReverse) {
         if (l == null || l.length == 0) {
             return gson.toJson(new SortResult<>(0L, l));
         }
-        if (n > l.length) n = l.length;
-        String[] result = l.clone();
-        long startTime = System.nanoTime();
 
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
+        String[] result = mergeSortString(l, isReverse);
 
-                if (isReverse) {
-                    merge(result, leftStart, mid, rightEnd, false);
-                } else {
-                    merge(result, leftStart, mid, rightEnd, true);
-                }
-            }
-        }
-
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
-
-        SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
-        return gson.toJson(sortResult);
+        long elapsedTime = System.nanoTime();
+        return gson.toJson(new SortResult<>(elapsedTime, result));
     }
 
-    private static void merge(int[] l, int left, int mid, int right, boolean ascending) {
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
-
-        int[] leftArr = new int[n1];
-        int[] rightArr = new int[n2];
-
-        System.arraycopy(l, left, leftArr, 0, n1);
-        System.arraycopy(l, mid + 1, rightArr, 0, n2);
-
-        int i = 0, j = 0, k = left;
-
-        while (i < n1 && j < n2) {
-            if ((ascending && leftArr[i] <= rightArr[j]) || (!ascending && leftArr[i] > rightArr[j])) {
-                l[k++] = leftArr[i++];
-            } else {
-                l[k++] = rightArr[j++];
-            }
+    private String[] mergeSortString(String[] array, boolean isReverse) {
+        if (array.length <= 1) {
+            return array;
         }
 
-        while (i < n1) {
-            l[k++] = leftArr[i++];
-        }
+        int mid = array.length / 2;
+        String[] left = mergeSortString(Arrays.copyOfRange(array, 0, mid), isReverse);
+        String[] right = mergeSortString(Arrays.copyOfRange(array, mid, array.length), isReverse);
 
-        while (j < n2) {
-            l[k++] = rightArr[j++];
-        }
+        return mergeString(left, right, isReverse);
     }
 
-    private static void merge(String[] l, int left, int mid, int right, boolean ascending) {
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
+    private String[] mergeString(String[] left, String[] right, boolean isReverse) {
+        String[] merged = new String[left.length + right.length];
+        int i = 0, j = 0, k = 0;
 
-        String[] leftArr = new String[n1];
-        String[] rightArr = new String[n2];
-
-        System.arraycopy(l, left, leftArr, 0, n1);
-        System.arraycopy(l, mid + 1, rightArr, 0, n2);
-
-        int i = 0, j = 0, k = left;
-
-        while (i < n1 && j < n2) {
-            if ((ascending && leftArr[i].compareTo(rightArr[j]) <= 0) ||
-                    (!ascending && leftArr[i].compareTo(rightArr[j]) > 0)) {
-                l[k++] = leftArr[i++];
+        while (i < left.length && j < right.length) {
+            if ((isReverse && left[i].compareTo(right[j]) > 0) || (!isReverse && left[i].compareTo(right[j]) <= 0)) {
+                merged[k++] = left[i++];
             } else {
-                l[k++] = rightArr[j++];
+                merged[k++] = right[j++];
             }
         }
 
-        while (i < n1) {
-            l[k++] = leftArr[i++];
+        while (i < left.length) {
+            merged[k++] = left[i++];
         }
 
-        while (j < n2) {
-            l[k++] = rightArr[j++];
+        while (j < right.length) {
+            merged[k++] = right[j++];
         }
+
+        return merged;
     }
 }

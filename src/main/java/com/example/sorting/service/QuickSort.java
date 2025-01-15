@@ -2,11 +2,14 @@ package com.example.sorting.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.util.Stack;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * Klasa zawierająca metody sortujące algorytmem quick sort
@@ -37,174 +40,172 @@ public class QuickSort implements SortJsonInterface {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private static class SortRequest<T> {
+    private static class SortRequest {
         JsonElement list;
-        int n;
         boolean isReverse;
         String key;
     }
 
-    /**
-     * Metoda "rozpakowująca" strukturę JSON i używająca jednej z dwóch metod w sortL w zależności od tego czy dana lista ma dane typu String czy int
-     *
-     * @param jsonInput JSON zawierający listę do posortowania, liczbę iteracji oraz informację o tym, w którą stronę idzie sortowanie.
-     * @return Posortowana lista i czas wykonania sortowania.
-     */
+    @Override
     public String sort(JsonObject jsonInput) {
         try {
-            QuickSort.SortRequest request = gson.fromJson(jsonInput, QuickSort.SortRequest.class);
+            SortRequest request = gson.fromJson(jsonInput, SortRequest.class);
 
-            JsonElement listElement = request.list;
-            int n = request.n;
-            boolean isReverse = request.isReverse;
-            String key = request.key;
-
-            if (listElement == null || !listElement.isJsonArray()) {
+            if (request.list == null || !request.list.isJsonArray()) {
                 throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
             }
 
-            JsonArray jsonArray = listElement.getAsJsonArray();
+            JsonArray jsonArray = request.list.getAsJsonArray();
+            String key = request.key;
+            boolean isReverse = request.isReverse;
 
             if (jsonArray.size() == 0) {
-                return gson.toJson(new int[0]);
+                return gson.toJson(new SortResult<>(0L, new ArrayList<>()));
             }
 
             JsonElement firstElement = jsonArray.get(0);
 
-            if (firstElement.isJsonPrimitive()) {
+            if (firstElement.isJsonObject() && key != null && !key.isEmpty()) {
+                List<JsonObject> objectList = new ArrayList<>();
+                jsonArray.forEach(el -> objectList.add(el.getAsJsonObject()));
+                return sortObjects(objectList, key, isReverse);
+            } else if (firstElement.isJsonPrimitive()) {
                 if (firstElement.getAsJsonPrimitive().isNumber()) {
                     int[] inputArray = gson.fromJson(jsonArray, int[].class);
-                    return sortL(inputArray, n, isReverse);
-                }
-
-                if (firstElement.getAsJsonPrimitive().isString()) {
+                    return sortL(inputArray, isReverse);
+                } else if (firstElement.getAsJsonPrimitive().isString()) {
                     String[] inputArray = gson.fromJson(jsonArray, String[].class);
-                    return sortL(inputArray, n, isReverse);
+                    return sortL(inputArray, isReverse);
                 }
             }
 
-            throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
+            throw new IllegalArgumentException("Unsupported data type or missing key for object sorting.");
         } catch (Exception e) {
             return createErrorResponse(e.getMessage());
         }
     }
 
-    /**
-     * Funkcja tworząca odpowiedź błędu w formacie JSON
-     *
-     * @param message Wiadomość o błędzie
-     * @return JSON zawierający informacje o błędzie
-     */
+    private String sortObjects(List<JsonObject> objectList, String key, boolean isReverse) {
+        long startTime = System.nanoTime();
+
+        quickSortObjects(objectList, 0, objectList.size() - 1, key, isReverse);
+
+        long elapsedTime = System.nanoTime() - startTime;
+        return gson.toJson(new SortResult<>(elapsedTime, objectList));
+    }
+
+    private void quickSortObjects(List<JsonObject> list, int low, int high, String key, boolean isReverse) {
+        if (low < high) {
+            int partitionIndex = partitionObjects(list, low, high, key, isReverse);
+            quickSortObjects(list, low, partitionIndex - 1, key, isReverse);
+            quickSortObjects(list, partitionIndex + 1, high, key, isReverse);
+        }
+    }
+
+    private int partitionObjects(List<JsonObject> list, int low, int high, String key, boolean isReverse) {
+        JsonObject pivot = list.get(high);
+        String pivotValue = pivot.get(key).getAsString();
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+            String currentValue = list.get(j).get(key).getAsString();
+            if ((isReverse && currentValue.compareTo(pivotValue) > 0) || (!isReverse && currentValue.compareTo(pivotValue) <= 0)) {
+                i++;
+                JsonObject temp = list.get(i);
+                list.set(i, list.get(j));
+                list.set(j, temp);
+            }
+        }
+
+        JsonObject temp = list.get(i + 1);
+        list.set(i + 1, list.get(high));
+        list.set(high, temp);
+
+        return i + 1;
+    }
+
     private String createErrorResponse(String message) {
         JsonObject errorResponse = new JsonObject();
         errorResponse.addProperty("error", message);
         return gson.toJson(errorResponse);
     }
 
-    public static String sortL(int[] l, int n, boolean isReverse) {
-        if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
-        if (n > l.length) n = l.length;
-        int[] result = l.clone();
-        Stack<int[]> stack = new Stack<>();
-        stack.push(new int[]{0, result.length - 1});
-
-        long startTime = System.nanoTime();
-
-        while (!stack.isEmpty() && n-- > 0) {
-            int[] range = stack.pop();
-            int low = range[0];
-            int high = range[1];
-
-            if (low < high) {
-                int partitionIndex;
-                if (isReverse) {
-                    partitionIndex = partition(result, low, high, false);
-                }
-                else {
-                    partitionIndex = partition(result, low, high, true);
-                }
-                stack.push(new int[]{low, partitionIndex - 1});
-                stack.push(new int[]{partitionIndex + 1, high});
-            }
+    public String sortL(int[] l, boolean isReverse) {
+        if (l == null || l.length == 0) {
+            return gson.toJson(new SortResult<>(0L, l));
         }
 
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
-
-        SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
-        return gson.toJson(sortResult);
-    }
-
-    public static String sortL(String[] l, int n, boolean isReverse) {
-        if (l == null || l.length == 0) return gson.toJson(new SortResult<>(0L, l));
-        if (n > l.length) n = l.length;
-        String[] result = l.clone();
-        Stack<int[]> stack = new Stack<>();
-        stack.push(new int[]{0, result.length - 1});
-
         long startTime = System.nanoTime();
+        quickSortInt(l, 0, l.length - 1, isReverse);
+        long elapsedTime = System.nanoTime() - startTime;
 
-        while (!stack.isEmpty() && n-- > 0) {
-            int[] range = stack.pop();
-            int low = range[0];
-            int high = range[1];
-
-            if (low < high) {
-                int partitionIndex;
-                if (isReverse) {
-                    partitionIndex = partition(result, low, high, false);
-                }
-                else {
-                    partitionIndex = partition(result, low, high, true);
-                }
-                stack.push(new int[]{low, partitionIndex - 1});
-                stack.push(new int[]{partitionIndex + 1, high});
-            }
-        }
-
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
-
-        SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
-        return gson.toJson(sortResult);
+        return gson.toJson(new SortResult<>(elapsedTime, l));
     }
 
-    private static int partition(int[] arr, int low, int high, boolean ascending) {
-        int pivot = arr[high];
+    private void quickSortInt(int[] array, int low, int high, boolean isReverse) {
+        if (low < high) {
+            int partitionIndex = partitionInt(array, low, high, isReverse);
+            quickSortInt(array, low, partitionIndex - 1, isReverse);
+            quickSortInt(array, partitionIndex + 1, high, isReverse);
+        }
+    }
+
+    private int partitionInt(int[] array, int low, int high, boolean isReverse) {
+        int pivot = array[high];
         int i = low - 1;
 
         for (int j = low; j < high; j++) {
-            if ((ascending && arr[j] < pivot) || (!ascending && arr[j] >= pivot)) {
+            if ((isReverse && array[j] > pivot) || (!isReverse && array[j] <= pivot)) {
                 i++;
-                int temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
+                int temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
             }
         }
 
-        int temp = arr[i + 1];
-        arr[i + 1] = arr[high];
-        arr[high] = temp;
+        int temp = array[i + 1];
+        array[i + 1] = array[high];
+        array[high] = temp;
 
         return i + 1;
     }
 
-    private static int partition(String[] arr, int low, int high, boolean ascending) {
-        String pivot = arr[high];
+    public String sortL(String[] l, boolean isReverse) {
+        if (l == null || l.length == 0) {
+            return gson.toJson(new SortResult<>(0L, l));
+        }
+
+        long startTime = System.nanoTime();
+        quickSortString(l, 0, l.length - 1, isReverse);
+        long elapsedTime = System.nanoTime() - startTime;
+
+        return gson.toJson(new SortResult<>(elapsedTime, l));
+    }
+
+    private void quickSortString(String[] array, int low, int high, boolean isReverse) {
+        if (low < high) {
+            int partitionIndex = partitionString(array, low, high, isReverse);
+            quickSortString(array, low, partitionIndex - 1, isReverse);
+            quickSortString(array, partitionIndex + 1, high, isReverse);
+        }
+    }
+
+    private int partitionString(String[] array, int low, int high, boolean isReverse) {
+        String pivot = array[high];
         int i = low - 1;
 
         for (int j = low; j < high; j++) {
-            if ((ascending && arr[j].compareTo(pivot) < 0) || (!ascending && arr[j].compareTo(pivot) >= 0)) {
+            if ((isReverse && array[j].compareTo(pivot) > 0) || (!isReverse && array[j].compareTo(pivot) <= 0)) {
                 i++;
-                String temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
+                String temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
             }
         }
 
-        String temp = arr[i + 1];
-        arr[i + 1] = arr[high];
-        arr[high] = temp;
+        String temp = array[i + 1];
+        array[i + 1] = array[high];
+        array[high] = temp;
 
         return i + 1;
     }

@@ -4,9 +4,9 @@ import java.util.List;
 
 public class SortRequest {
     private int n;
-    private List<Object> array; // Obsługa zarówno Integer, jak i String
+    private List<Object> array; // Obsługa zarówno Integer, String, jak i obiektów
+    private String key; // Pole do sortowania
 
-    // Gettery i settery
     public int getN() {
         return n;
     }
@@ -21,5 +21,13 @@ public class SortRequest {
 
     public void setArray(List<Object> array) {
         this.array = array;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
