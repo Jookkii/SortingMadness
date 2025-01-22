@@ -120,7 +120,7 @@ public class BubbleSortTest {
         String jsonInput = """
             {
                 "list": [5, 10, 2, 18, 0, 6, -3, 25],
-                "n": 3,
+                "n": 5,
                 "isReverse": false,
                 "key": null
             }
@@ -165,5 +165,144 @@ public class BubbleSortTest {
         assertTrue(resultObj.has("executionTime"));
     }
 
+    @Test
+    public void ascendingObjectListByKey() {
+        String jsonInput = """
+                {
+                    "list": [
+                        { "name": "John", "age": 30, "gender": "Male" },
+                        { "name": "Emily", "age": 27, "gender": "Female" },
+                        { "name": "Michael", "age": 35, "gender": "Male" },
+                        { "name": "Sophia", "age": 29, "gender": "Female" }
+                    ],
+                    "n": 5,
+                    "isReverse": false,
+                    "key": "age"
+                }
+            """;
+        JsonObject jsonObject = JsonParser.parseString(jsonInput).getAsJsonObject();
+        String result = bubbleSort.sort(jsonObject);
+
+        JsonObject resultObj = JsonParser.parseString(result).getAsJsonObject();
+        JsonObject expected = JsonParser.parseString("""
+        {"sortedArray": [
+                        { "name": "Emily", "age": 27, "gender": "Female" },
+                        { "name": "Sophia", "age": 29, "gender": "Female" },
+                        { "name": "John", "age": 30, "gender": "Male" },
+                        { "name": "Michael", "age": 35, "gender": "Male" }
+                    ]}
+        """).getAsJsonObject();
+
+        assertEquals(
+                expected.get("sortedArray").toString(),
+                resultObj.get("sortedArray").toString()
+        );
+        assertTrue(resultObj.has("executionTime"));
+    }
+
+    @Test
+    public void descendingObjectListByKey() {
+        String jsonInput = """
+                {
+                    "list": [
+                        { "name": "John", "age": 30, "gender": "Male" },
+                        { "name": "Emily", "age": 27, "gender": "Female" },
+                        { "name": "Michael", "age": 35, "gender": "Male" },
+                        { "name": "Sophia", "age": 29, "gender": "Female" }
+                    ],
+                    "n": 5,
+                    "isReverse": true,
+                    "key": "age"
+                }
+            """;
+        JsonObject jsonObject = JsonParser.parseString(jsonInput).getAsJsonObject();
+        String result = bubbleSort.sort(jsonObject);
+
+        JsonObject resultObj = JsonParser.parseString(result).getAsJsonObject();
+        JsonObject expected = JsonParser.parseString("""
+        {"sortedArray": [
+                        { "name": "Michael", "age": 35, "gender": "Male" },
+                        { "name": "John", "age": 30, "gender": "Male" },
+                        { "name": "Sophia", "age": 29, "gender": "Female" },
+                        { "name": "Emily", "age": 27, "gender": "Female" }
+                    ]}
+        """).getAsJsonObject();
+
+        assertEquals(
+                expected.get("sortedArray").toString(),
+                resultObj.get("sortedArray").toString()
+        );
+        assertTrue(resultObj.has("executionTime"));
+    }
+
+    @Test
+    public void ObjectListByKeyIterationLimit() {
+        String jsonInput = """
+                {
+                    "list": [
+                        { "name": "John", "age": 30, "gender": "Male" },
+                        { "name": "Emily", "age": 27, "gender": "Female" },
+                        { "name": "Michael", "age": 35, "gender": "Male" },
+                        { "name": "Sophia", "age": 29, "gender": "Female" }
+                    ],
+                    "n": 2,
+                    "isReverse": false,
+                    "key": "age"
+                }
+            """;
+        JsonObject jsonObject = JsonParser.parseString(jsonInput).getAsJsonObject();
+        String result = bubbleSort.sort(jsonObject);
+
+        JsonObject resultObj = JsonParser.parseString(result).getAsJsonObject();
+        JsonObject expected = JsonParser.parseString("""
+        {"sortedArray": [
+                        { "name": "Emily", "age": 27, "gender": "Female" },
+                        { "name": "John", "age": 30, "gender": "Male" },
+                        { "name": "Sophia", "age": 29, "gender": "Female" },
+                        { "name": "Michael", "age": 35, "gender": "Male" }
+                    ]}
+        """).getAsJsonObject();
+
+        assertEquals(
+                expected.get("sortedArray").toString(),
+                resultObj.get("sortedArray").toString()
+        );
+        assertTrue(resultObj.has("executionTime"));
+    }
+
+    @Test
+    public void WrongKey() {
+        String jsonInput = """
+                {
+                    "list": [
+                        { "name": "John", "age": 30, "gender": "Male" },
+                        { "name": "Emily", "age": 27, "gender": "Female" },
+                        { "name": "Michael", "age": 35, "gender": "Male" },
+                        { "name": "Sophia", "age": 29, "gender": "Female" }
+                    ],
+                    "n": 2,
+                    "isReverse": false,
+                    "key": "xd"
+                }
+            """;
+        JsonObject jsonObject = JsonParser.parseString(jsonInput).getAsJsonObject();
+        String result = bubbleSort.sort(jsonObject);
+
+        JsonObject resultObj = JsonParser.parseString(result).getAsJsonObject();
+        JsonObject expected = JsonParser.parseString("""
+        {"sortedArray": [
+                        { "name": "John", "age": 30, "gender": "Male" },
+                        { "name": "Emily", "age": 27, "gender": "Female" },
+                        { "name": "Michael", "age": 35, "gender": "Male" },
+                        { "name": "Sophia", "age": 29, "gender": "Female" }
+                    ]}
+        """).getAsJsonObject();
+
+        assertEquals(
+                expected.get("sortedArray").toString(),
+                resultObj.get("sortedArray").toString()
+        );
+        assertTrue(resultObj.has("executionTime"));
+    }
 
 }
