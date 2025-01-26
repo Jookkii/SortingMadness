@@ -221,6 +221,14 @@ public class MergeSort implements SortJsonInterface {
         return gson.toJson(sortResult);
     }
 
+    /**
+     * Metoda wspomagająco do Merge Sorta, wykonująca faktyczną operację merge, wersja dla Integerów
+     * @param l Lista będaca fragmentem oryginalnej listy do posortowania
+     * @param left Indeks początkowy lewej części do scalenia
+     * @param mid Indeks środkowy listy dzielący ją na część lewą i prawą
+     * @param right Indeks końcowy prawej części do scalenia
+     * @param ascending Znacznik określający czy lista ma być sortowana malejąco
+     */
     private static void merge(int[] l, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;
@@ -250,6 +258,14 @@ public class MergeSort implements SortJsonInterface {
         }
     }
 
+    /**
+     * Metoda wspomagająco do Merge Sorta, wykonująca faktyczną operację merge, wersja dla Stringów
+     * @param l Lista będaca fragmentem oryginalnej listy do posortowania
+     * @param left Indeks początkowy lewej części do scalenia
+     * @param mid Indeks środkowy listy dzielący ją na część lewą i prawą
+     * @param right Indeks końcowy prawej części do scalenia
+     * @param ascending Znacznik określający czy lista ma być sortowana malejąco
+     */
     private static void merge(String[] l, int left, int mid, int right, boolean ascending) {
         int n1 = mid - left + 1;
         int n2 = right - mid;

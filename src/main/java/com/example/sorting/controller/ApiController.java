@@ -26,7 +26,6 @@ public class ApiController {
         logger.info("Zakończono inicjalizację kontrolera");
     }
 
-
     @PostMapping("/sort")
     public List<SortResult> sort(
             @RequestParam String algorithms,
@@ -40,8 +39,11 @@ public class ApiController {
         logger.info("Odebrano przekazane parametry");
 
         for (String algorithm : algorithmList) {
+            if (algorithm == null || algorithm.trim().isEmpty()) {
+                algorithm = chooseDefaultAlgorithm(jsonObject);
+            }
             String sortedArrayJson = sortContext.sort(algorithm, jsonObject);
-            logger.debug("wykorzystano strategie:"+algorithm);
+            logger.debug("Wykorzystano strategię: " + algorithm);
             JsonObject sortedResult = JsonParser.parseString(sortedArrayJson).getAsJsonObject();
             List<String> generatedArray = new ArrayList<>();
             if (sortedResult.has("generatedArray")) {
@@ -50,20 +52,50 @@ public class ApiController {
             }
             List<String> sortedArray = new ArrayList<>();
             sortedResult.getAsJsonArray("sortedArray").forEach(element -> sortedArray.add(element.getAsString()));
-            logger.debug("utworzono json z wynikiem działania strategii:"+algorithm);
+            logger.debug("Utworzono JSON z wynikiem działania strategii: " + algorithm);
 
             long executionTime = sortedResult.get("executionTime").getAsLong();
 
             results.add(new SortResult(algorithm, executionTime, sortedArray, generatedArray));
         }
-        logger.info("zakończono wykonywanie algorytmów");
+        logger.info("Zakończono wykonywanie algorytmów");
         return results;
     }
-
 
     @GetMapping("/api")
     public String getData2() {
         return "Smile:)";
     }
 
+    /**
+     * Wybiera domyślny algorytm sortowania na podstawie danych wejściowych.
+     */
+    private String chooseDefaultAlgorithm(JsonObject jsonObject) {
+        JsonArray array = jsonObject.getAsJsonArray("list");
+        int n;
+        double disorderRatio = 1;
+        try {
+            n = array.size();
+            int disorderCount = 0;
+            for (int i = 0; i < n - 1; i++) {
+                if (array.get(i).getAsInt() > array.get(i + 1).getAsInt()) {
+                    disorderCount++;
+                }
+            }
+            disorderRatio = (double) disorderCount / n;
+        }
+        catch (NullPointerException e) {
+            n = 0;
+        }
+        if (n <= 10) {
+            return "bubblesort"; // mały zbiór
+        } else if (disorderRatio <= 0.1) {
+            return "insertionsort"; // prawie posortowane
+        } else if (n <= 1000) {
+            return "quickSort"; // średni zbiór
+        } else {
+            return "mergesort"; // duży zbiór
+        }
+    }
 }
+

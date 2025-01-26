@@ -199,7 +199,7 @@ public class QuickSort implements SortJsonInterface {
      * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
      * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
      * @param time Czas, po którym algorytm ma zakończyć pracę i zwrócić aktualny stan listy; jeżeli równy zero to całość wykonuje się normalnie
-     * @return Posortowana lista i czas sortowania jako
+     * @return Posortowana lista i czas sortowania jako json
      */
     public static String sortL(String[] l, int n, boolean isReverse, long time) {
         n = (n <= 0 || n > l.length) ? l.length : n;
@@ -254,6 +254,14 @@ public class QuickSort implements SortJsonInterface {
         return gson.toJson(sortResult);
     }
 
+    /**
+     *Funkcja bierze podtablicę (zadaną przez indeksy low i high) i wybiera element na pozycji high jako pivot, następnie przesuwa elementy tablicy tak, aby były uporządkowane względem pivota; wersja dla int
+     * @param arr Lista, która zostanie częściowo posortowana
+     * @param low Indeks początkowy podtablicy, która ma zostać podzielona
+     * @param high Indeks końcowy podtablicy, który wskazuje na element wybrany jako pivot
+     * @param ascending Znacznik określający porządek sortowania
+     * @return  indeks, pod którym pivot został umieszczony po podziale
+     */
     private static int partition(int[] arr, int low, int high, boolean ascending) {
         int pivot = arr[high];
         int i = low - 1;
@@ -274,6 +282,14 @@ public class QuickSort implements SortJsonInterface {
         return i + 1;
     }
 
+    /**
+     *Funkcja bierze podtablicę (zadaną przez indeksy low i high) i wybiera element na pozycji high jako pivot, następnie przesuwa elementy tablicy tak, aby były uporządkowane względem pivota; wersja dla String
+     * @param arr Lista, która zostanie częściowo posortowana
+     * @param low Indeks początkowy podtablicy, która ma zostać podzielona
+     * @param high Indeks końcowy podtablicy, który wskazuje na element wybrany jako pivot
+     * @param ascending Znacznik określający porządek sortowania
+     * @return  indeks, pod którym pivot został umieszczony po podziale
+     */
     private static int partition(String[] arr, int low, int high, boolean ascending) {
         String pivot = arr[high];
         int i = low - 1;
