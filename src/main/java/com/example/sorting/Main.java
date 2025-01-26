@@ -14,7 +14,6 @@ public class Main {
         logger.info("Sorting Application Started!");
         SpringApplication.run(Main.class, args); // Uruchamia Spring Boot
         System.out.println("Welcome to Sorting Application!");
-
         int[] numbers = {5, 3, 8, 4, 2};
         String[] strings = {"banana", "apple", "cherry"};
 
