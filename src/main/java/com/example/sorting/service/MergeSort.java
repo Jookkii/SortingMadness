@@ -7,6 +7,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
 /**
  * Klasa zawierająca metody sortujące algorytmem merge sort
  *
@@ -19,8 +21,10 @@ public class MergeSort implements SortJsonInterface {
     private static class SortResult<T> {
         private long executionTime;
         private T sortedArray;
+        private T generatedArray;
 
-        public SortResult(long executionTime, T sortedArray) {
+        public SortResult(T generatedArray, long executionTime, T sortedArray) {
+            this.generatedArray = generatedArray;
             this.executionTime = executionTime;
             this.sortedArray = sortedArray;
         }
@@ -32,6 +36,7 @@ public class MergeSort implements SortJsonInterface {
         public T getSortedArray() {
             return sortedArray;
         }
+        public T getGeneratedArray() { return generatedArray; }
     }
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -41,6 +46,7 @@ public class MergeSort implements SortJsonInterface {
         int n;
         boolean isReverse;
         String key;
+        long time;
     }
 
     /**
@@ -57,33 +63,33 @@ public class MergeSort implements SortJsonInterface {
             int n = request.n;
             boolean isReverse = request.isReverse;
             String key = request.key;
+            long time = request.time;
 
-            if (listElement == null || !listElement.isJsonArray()) {
-                throw new IllegalArgumentException("The 'list' field must be a non-null JSON array.");
-            }
+            if (request.list == null) {
+                return sortL(new int[0], request.n, request.isReverse, request.time);
+            } else {
+                JsonArray jsonArray = listElement.getAsJsonArray();
 
-            JsonArray jsonArray = listElement.getAsJsonArray();
-
-            if (jsonArray.size() == 0) {
-                return gson.toJson(new int[0]);
-            }
-
-            JsonElement firstElement = jsonArray.get(0);
-
-            if (firstElement.isJsonPrimitive()) {
-                if (firstElement.getAsJsonPrimitive().isNumber()) {
-                    int[] inputArray = gson.fromJson(jsonArray, int[].class);
-                    return sortL(inputArray, n, isReverse);
+                if (jsonArray.size() == 0) {
+                    return gson.toJson(new int[0]);
                 }
 
-                if (firstElement.getAsJsonPrimitive().isString()) {
-                    String[] inputArray = gson.fromJson(jsonArray, String[].class);
-                    return sortL(inputArray, n, isReverse);
-                }
-            }
+                JsonElement firstElement = jsonArray.get(0);
 
-            throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
-        } catch (Exception e) {
+                if (firstElement.isJsonPrimitive()) {
+                    if (firstElement.getAsJsonPrimitive().isNumber()) {
+                        int[] inputArray = gson.fromJson(jsonArray, int[].class);
+                        return sortL(inputArray, n, isReverse, time);
+                    }
+
+                    if (firstElement.getAsJsonPrimitive().isString()) {
+                        String[] inputArray = gson.fromJson(jsonArray, String[].class);
+                        return sortL(inputArray, n, isReverse, time);
+                    }
+                }
+
+                throw new IllegalArgumentException("Unsupported data type in the list. Only numbers or strings are supported.");
+            }} catch (Exception e) {
             return createErrorResponse(e.getMessage());
         }
     }
@@ -100,59 +106,118 @@ public class MergeSort implements SortJsonInterface {
         return gson.toJson(errorResponse);
     }
 
-    public static String sortL(int[] l, int n, boolean isReverse) {
-        if (l == null || l.length == 0) {
-            return gson.toJson(new SortResult<>(0L, l));
+    /**
+     * Metoda sortująca listy integerów; w przypadku braku listy na wejściu jest generowana ona losowo o długości n bądź 10 jeżeli n też jest puste
+     *
+     * @param l Nieposortowana lista integerów
+     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
+     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
+     * @param time Czas, po którym algorytm ma zakończyć pracę i zwrócić aktualny stan listy; jeżeli równy zero to całość wykonuje się normalnie
+     * @return Posortowana lista i czas sortowania
+     */
+    public static String sortL(int[] l, int n, boolean isReverse, long time) {
+        boolean isDataGenerated = false;
+        long elapsedTime;
+
+        if (l.length == 0) {
+            Random random = new Random();
+            n = (n <= 0) ? 10 : n;
+            l = new int[n];
+            for (int i = 0; i < n; i++) {
+                l[i] = random.nextInt(100);
+            }
+            isDataGenerated = true;
         }
-        if (n > l.length) n = l.length;
+
+        if (n <= 0 || n > l.length) {
+            n = l.length;
+        }
         int[] result = l.clone();
         long startTime = System.nanoTime();
+        SortResult<int[]> sortResult;
 
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
+        if (time != 0) {
+            int k = 0;
+            while (k < n && System.nanoTime() - startTime < time) {
+                for (int currentSize = 1; currentSize < n; currentSize *= 2) {
+                    for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
+                        int mid = Math.min(leftStart + currentSize - 1, n - 1);
+                        int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
 
-                if (isReverse) {
-                    merge(result, leftStart, mid, rightEnd, false);
-                } else {
-                    merge(result, leftStart, mid, rightEnd, true);
+                        merge(result, leftStart, mid, rightEnd, !isReverse);
+                    }
                 }
             }
+        } else {
+            for (int currentSize = 1; currentSize < n; currentSize *= 2) {
+                for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
+                    int mid = Math.min(leftStart + currentSize - 1, n - 1);
+                    int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
+
+                    merge(result, leftStart, mid, rightEnd, !isReverse);
+                }
+            }
+
         }
+        elapsedTime = System.nanoTime() - startTime;
 
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
 
-        SortResult<int[]> sortResult = new SortResult<>(elapsedTime, result);
+        if (isDataGenerated) {
+            sortResult = new SortResult<>(l, elapsedTime, result);
+        }
+        else {
+            sortResult = new SortResult<>(null, elapsedTime, result);
+        }
         return gson.toJson(sortResult);
     }
 
-    public static String sortL(String[] l, int n, boolean isReverse) {
-        if (l == null || l.length == 0) {
-            return gson.toJson(new SortResult<>(0L, l));
-        }
-        if (n > l.length) n = l.length;
+    /**
+     * Metoda sortująca listy Stringów
+     *
+     * @param l Nieposortowana lista Stringów
+     * @param n Liczba iteracji, które program ma wykonać przed zwróceniem listy
+     * @param isReverse Znacznik określający, czy lista ma być sortowana malejąco
+     * @param time Czas, po którym algorytm ma zakończyć pracę i zwrócić aktualny stan listy; jeżeli równy zero to całość wykonuje się normalnie
+     * @return Posortowana lista i czas sortowania jako
+     */
+    public static String sortL(String[] l, int n, boolean isReverse, long time) {
+        n = (n <= 0 || n > l.length) ? l.length : n;
         String[] result = l.clone();
+        SortResult<String[]> sortResult;
         long startTime = System.nanoTime();
 
-        for (int currentSize = 1; currentSize < n; currentSize *= 2) {
-            for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
-                int mid = Math.min(leftStart + currentSize - 1, n - 1);
-                int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
+        if (time != 0) {
+            int k = 0;
+            while (k < n && System.nanoTime() - startTime < time) {
+                for (int currentSize = 1; currentSize < n; currentSize *= 2) {
+                    for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
+                        int mid = Math.min(leftStart + currentSize - 1, n - 1);
+                        int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
 
-                if (isReverse) {
-                    merge(result, leftStart, mid, rightEnd, false);
-                } else {
-                    merge(result, leftStart, mid, rightEnd, true);
+                        if (isReverse) {
+                            merge(result, leftStart, mid, rightEnd, false);
+                        } else {
+                            merge(result, leftStart, mid, rightEnd, true);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (int currentSize = 1; currentSize < n; currentSize *= 2) {
+                for (int leftStart = 0; leftStart < n - 1; leftStart += 2 * currentSize) {
+                    int mid = Math.min(leftStart + currentSize - 1, n - 1);
+                    int rightEnd = Math.min(leftStart + 2 * currentSize - 1, n - 1);
+
+                    if (isReverse) {
+                        merge(result, leftStart, mid, rightEnd, false);
+                    } else {
+                        merge(result, leftStart, mid, rightEnd, true);
+                    }
                 }
             }
         }
-
-        long endTime = System.nanoTime();
-        long elapsedTime = endTime - startTime;
-
-        SortResult<String[]> sortResult = new SortResult<>(elapsedTime, result);
+        long elapsedTime = System.nanoTime() - startTime;
+        sortResult = new SortResult<>(null, elapsedTime, result);
         return gson.toJson(sortResult);
     }
 

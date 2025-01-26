@@ -1,6 +1,7 @@
 package com.example.sorting.controller;
 
 import com.example.sorting.Main;
+import com.google.gson.JsonArray;
 import com.example.sorting.dto.SortResult;
 import com.example.sorting.service.*;
 import com.google.gson.JsonObject;
@@ -42,13 +43,18 @@ public class ApiController {
             String sortedArrayJson = sortContext.sort(algorithm, jsonObject);
             logger.debug("wykorzystano strategie:"+algorithm);
             JsonObject sortedResult = JsonParser.parseString(sortedArrayJson).getAsJsonObject();
+            List<String> generatedArray = new ArrayList<>();
+            if (sortedResult.has("generatedArray")) {
+                JsonArray generatedJsonArray = sortedResult.getAsJsonArray("generatedArray");
+                generatedJsonArray.forEach(element -> generatedArray.add(element.getAsString()));
+            }
             List<String> sortedArray = new ArrayList<>();
             sortedResult.getAsJsonArray("sortedArray").forEach(element -> sortedArray.add(element.getAsString()));
             logger.debug("utworzono json z wynikiem działania strategii:"+algorithm);
 
             long executionTime = sortedResult.get("executionTime").getAsLong();
 
-            results.add(new SortResult(algorithm, executionTime, sortedArray));
+            results.add(new SortResult(algorithm, executionTime, sortedArray, generatedArray));
         }
         logger.info("zakończono wykonywanie algorytmów");
         return results;
