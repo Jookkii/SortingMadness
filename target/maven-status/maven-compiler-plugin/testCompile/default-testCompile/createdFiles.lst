@@ -1,2 +1,5 @@
-com\example\sorting\MainTest2.class
 com\example\sorting\MainTest.class
+com\example\sorting\service\MergeSortTest.class
+com\example\sorting\MainTest2.class
+com\example\sorting\service\SortContextTest.class
+com\example\sorting\service\BubbleSortTest.class

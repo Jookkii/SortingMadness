@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.example.sorting"},{"l":"com.example.sorting.controller"},{"l":"com.example.sorting.dto"},{"l":"com.example.sorting.service"}];updateSearchResults();

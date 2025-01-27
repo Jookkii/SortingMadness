@@ -1,13 +1,13 @@
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\Main.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\SortContext.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\SelectionSort.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\SortJsonInterface.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\MergeSort.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\InsertionSort.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\package-info.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\QuickSort.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\dto\SortRequest.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\ShellSort.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\controller\ApiController.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\service\BubbleSort.java
-C:\Users\mroks\Desktop\Nowy folder\SortingMadness\src\main\java\com\example\sorting\dto\SortResult.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\MergeSort.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\QuickSort.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\dto\SortRequest.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\controller\ApiController.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\SortContext.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\ShellSort.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\SortJsonInterface.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\BubbleSort.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\package-info.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\InsertionSort.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\service\SelectionSort.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\Main.java
+C:\Users\joki1\OneDrive\Pulpit\Studia\Semestr 5\Inżynieria Oprogramowania\projekt\SortingMadness\src\main\java\com\example\sorting\dto\SortResult.java
